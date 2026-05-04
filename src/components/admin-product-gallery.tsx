@@ -1,4 +1,7 @@
+"use client";
+
 import { appendProductGalleryImage, removeProductGalleryImage } from "@/actions/admin-product-gallery";
+import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import type { ProductGalleryImage } from "@/lib/product-gallery";
 import { resolveGalleryImageSrc } from "@/lib/product-gallery";
 import { adminInput, adminLabel } from "@/lib/admin-ui";
@@ -31,7 +34,11 @@ export function AdminProductGallery({ productId, images }: Props) {
                     URL tidak valid
                   </div>
                 )}
-                <form action={removeProductGalleryImage} className="absolute right-1.5 top-1.5">
+                <AdminSaveForm
+                  action={removeProductGalleryImage}
+                  className="absolute right-1.5 top-1.5"
+                  successMessage="Gambar dihapus dari galeri."
+                >
                   <input type="hidden" name="product_id" value={productId} />
                   <input type="hidden" name="index" value={String(index)} />
                   <button
@@ -40,7 +47,7 @@ export function AdminProductGallery({ productId, images }: Props) {
                   >
                     Hapus
                   </button>
-                </form>
+                </AdminSaveForm>
               </li>
             );
           })}
@@ -49,7 +56,11 @@ export function AdminProductGallery({ productId, images }: Props) {
         <p className="text-sm text-neutral-500">Belum ada gambar.</p>
       )}
 
-      <form action={appendProductGalleryImage} className="flex flex-col gap-4 border-t border-neutral-100 pt-4 sm:flex-row sm:flex-wrap sm:items-end">
+      <AdminSaveForm
+        action={appendProductGalleryImage}
+        className="flex flex-col gap-4 border-t border-neutral-100 pt-4 sm:flex-row sm:flex-wrap sm:items-end"
+        successMessage="Gambar ditambahkan ke galeri."
+      >
         <input type="hidden" name="product_id" value={productId} />
         <div className="min-w-0 flex-1 sm:max-w-xs">
           <label htmlFor={`gallery-file-${productId}`} className={adminLabel}>
@@ -78,7 +89,7 @@ export function AdminProductGallery({ productId, images }: Props) {
         <button type="submit" className={uploadBtn}>
           Tambah gambar
         </button>
-      </form>
+      </AdminSaveForm>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { parseGalleryImages } from "@/lib/product-gallery";
+import { INDUSTRY_ICON_KEY_SET } from "@/lib/industry-icon-keys";
 import type { Post, Product, Service, SiteConfig } from "@/types/database";
 
 function mapProductRow(row: Record<string, unknown>): Product {
@@ -26,7 +27,9 @@ function parseIndustries(raw: unknown): SiteConfig["industries_json"] {
         typeof o.name === "string" &&
         typeof o.summary === "string"
       ) {
-        return { key: o.key, name: o.name, summary: o.summary };
+        const icon_key =
+          typeof o.icon_key === "string" && INDUSTRY_ICON_KEY_SET.has(o.icon_key) ? o.icon_key : undefined;
+        return { key: o.key, name: o.name, summary: o.summary, ...(icon_key ? { icon_key } : {}) };
       }
       return null;
     })

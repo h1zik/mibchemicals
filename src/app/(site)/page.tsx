@@ -3,6 +3,7 @@ import { IndustryIcon } from "@/components/industry-icon";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { SolutionSection } from "@/components/solution-section";
 import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
+import { resolveIndustryIconKey } from "@/lib/industry-icon-keys";
 import { getPosts, getProducts, getServices, getSiteConfig } from "@/lib/data/queries";
 import { getProductCardImageUrl } from "@/lib/product-gallery";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -93,7 +94,7 @@ export default async function HomePage() {
               <li key={ind.key}>
                 <ScrollReveal delay={i * 0.06} className="h-full">
                   <div className="flex h-full flex-col rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
-                    <IndustryIcon industryKey={ind.key} />
+                    <IndustryIcon industryKey={resolveIndustryIconKey(ind)} />
                     <h3 className="mt-4 text-lg font-bold text-foreground">{ind.name}</h3>
                     <p className="mt-2 text-sm text-neutral-600">{ind.summary}</p>
                   </div>

@@ -8,6 +8,7 @@ import {
 } from "@/actions/admin";
 import { AdminBrandingUploads } from "@/components/admin-branding-uploads";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { AdminSettingsFormFooter } from "@/components/admin/admin-settings-form-footer";
 import { AdminSettingsSection } from "@/components/admin/admin-settings-section";
 import { IndustriesSectionEditor } from "@/components/admin/industries-section-editor";
@@ -35,11 +36,15 @@ export default async function AdminSettingsPage() {
             baris <code className="rounded bg-amber-100/80 px-1 font-mono text-xs">singleton_key = main</code>, atau
             query gagal. Buat satu baris penuh dari template agar tombol simpan per bagian berfungsi.
           </p>
-          <form action={createSiteConfigRow} className="mt-4">
+          <AdminSaveForm
+            action={createSiteConfigRow}
+            className="mt-4"
+            successMessage="Konfigurasi situs berhasil dibuat. Anda bisa menyimpan tiap bagian di bawah."
+          >
             <button type="submit" className={adminPrimaryBtn}>
               Buat konfigurasi dari template
             </button>
-          </form>
+          </AdminSaveForm>
         </div>
       ) : null}
 
@@ -49,7 +54,12 @@ export default async function AdminSettingsPage() {
           title="SEO"
           description="Nilai default meta untuk halaman yang tidak menimpa title/description sendiri."
         >
-          <form id="settings-seo" action={updateSiteConfigSeo} className="space-y-4">
+          <AdminSaveForm
+            id="settings-seo"
+            action={updateSiteConfigSeo}
+            className="space-y-4"
+            successMessage="Pengaturan SEO disimpan."
+          >
             <div>
               <label className={adminLabel}>Meta title default</label>
               <input name="meta_title_default" defaultValue={cfg.meta_title_default} className={adminInput} />
@@ -67,7 +77,7 @@ export default async function AdminSettingsPage() {
               <label className={adminLabel}>Keywords (koma)</label>
               <textarea name="site_keywords" rows={2} defaultValue={cfg.site_keywords} className={adminInput} />
             </div>
-          </form>
+          </AdminSaveForm>
           <AdminSettingsFormFooter formId="settings-seo" section="seo" />
         </AdminSettingsSection>
 
@@ -75,7 +85,12 @@ export default async function AdminSettingsPage() {
           title="Perusahaan & kontak"
           description="Identitas perusahaan dan kontak yang ditampilkan di footer, kontak, dan blok teks terkait."
         >
-          <form id="settings-company" action={updateSiteConfigCompany} className="space-y-4">
+          <AdminSaveForm
+            id="settings-company"
+            action={updateSiteConfigCompany}
+            className="space-y-4"
+            successMessage="Data perusahaan & kontak disimpan."
+          >
             <div>
               <label className={adminLabel}>Nama perusahaan</label>
               <input name="company_name" defaultValue={cfg.company_name} className={adminInput} />
@@ -103,7 +118,7 @@ export default async function AdminSettingsPage() {
               <label className={adminLabel}>Alamat</label>
               <textarea name="contact_address" rows={2} defaultValue={cfg.contact_address} className={adminInput} />
             </div>
-          </form>
+          </AdminSaveForm>
           <AdminSettingsFormFooter formId="settings-company" section="company" />
         </AdminSettingsSection>
 
@@ -111,7 +126,12 @@ export default async function AdminSettingsPage() {
           title="Logo & favicon"
           description="Logo di navbar dan ikon tab browser. Bisa isi URL manual atau unggah ke bucket site-assets."
         >
-          <form id="settings-branding" action={updateSiteConfigBranding} className="space-y-4">
+          <AdminSaveForm
+            id="settings-branding"
+            action={updateSiteConfigBranding}
+            className="space-y-4"
+            successMessage="Pengaturan logo & favicon disimpan."
+          >
             <div>
               <label className={adminLabel}>URL logo navbar</label>
               <input
@@ -134,7 +154,7 @@ export default async function AdminSettingsPage() {
               />
               <p className="mt-1.5 text-xs text-neutral-500">Harus URL absolut (https). Setelah simpan, hard refresh jika ikon tab tidak berubah.</p>
             </div>
-          </form>
+          </AdminSaveForm>
           <AdminBrandingUploads />
           <AdminSettingsFormFooter formId="settings-branding" section="branding" />
         </AdminSettingsSection>
@@ -143,7 +163,12 @@ export default async function AdminSettingsPage() {
           title="Hero"
           description="Judul besar beranda, subjudul, dan tombol ajakan utama / sekunder."
         >
-          <form id="settings-hero" action={updateSiteConfigHero} className="space-y-4">
+          <AdminSaveForm
+            id="settings-hero"
+            action={updateSiteConfigHero}
+            className="space-y-4"
+            successMessage="Teks hero beranda disimpan."
+          >
             <div>
               <label className={adminLabel}>Judul</label>
               <input name="hero_title" defaultValue={cfg.hero_title} className={adminInput} />
@@ -182,7 +207,7 @@ export default async function AdminSettingsPage() {
                 />
               </div>
             </div>
-          </form>
+          </AdminSaveForm>
           <AdminSettingsFormFooter formId="settings-hero" section="hero" />
         </AdminSettingsSection>
 
@@ -190,7 +215,12 @@ export default async function AdminSettingsPage() {
           title="Solusi (Problem → Inovasi → MIB)"
           description="Tiga blok narasi beranda. Judul singkat dan paragraf isi untuk masing-masing blok."
         >
-          <form id="settings-solutions" action={updateSiteConfigSolutions} className="space-y-4">
+          <AdminSaveForm
+            id="settings-solutions"
+            action={updateSiteConfigSolutions}
+            className="space-y-4"
+            successMessage="Blok solusi beranda disimpan."
+          >
             {(
               [
                 [
@@ -213,7 +243,7 @@ export default async function AdminSettingsPage() {
                 <textarea name={bk} rows={3} defaultValue={bv} className={adminControl} />
               </div>
             ))}
-          </form>
+          </AdminSaveForm>
           <AdminSettingsFormFooter formId="settings-solutions" section="solutions" />
         </AdminSettingsSection>
 

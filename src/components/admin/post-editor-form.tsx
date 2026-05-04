@@ -3,6 +3,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminPostCoverUpload } from "@/components/admin-post-cover-upload";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { deletePostForm, upsertPost } from "@/actions/admin";
 import {
   adminDangerZoneButton,
@@ -73,7 +74,7 @@ export function PostEditorForm({ post }: Props) {
         </div>
       </div>
 
-      <form action={upsertPost} className="space-y-8">
+      <AdminSaveForm action={upsertPost} className="space-y-8" successMessage="Artikel berhasil disimpan.">
         {isEdit && p ? <input type="hidden" name="id" value={p.id} /> : null}
 
         <AdminFormSection
@@ -249,7 +250,7 @@ export function PostEditorForm({ post }: Props) {
             {isEdit ? "Simpan perubahan" : "Simpan artikel"}
           </button>
         </div>
-      </form>
+      </AdminSaveForm>
 
       {isEdit && p ? (
         <aside className="mt-8 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">

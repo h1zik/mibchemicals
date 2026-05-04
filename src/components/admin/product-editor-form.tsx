@@ -3,6 +3,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminProductGallery } from "@/components/admin-product-gallery";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { deleteProductForm, uploadProductMsds, upsertProduct } from "@/actions/admin";
 import {
   adminCard,
@@ -62,7 +63,7 @@ export function ProductEditorForm({ product }: Props) {
         )}
       </div>
 
-      <form action={upsertProduct} className="space-y-8">
+      <AdminSaveForm action={upsertProduct} className="space-y-8" successMessage="Produk berhasil disimpan.">
         {isEdit && p ? <input type="hidden" name="id" value={p.id} /> : null}
 
         <AdminFormSection
@@ -232,7 +233,7 @@ export function ProductEditorForm({ product }: Props) {
             {isEdit ? "Simpan perubahan" : "Simpan produk"}
           </button>
         </div>
-      </form>
+      </AdminSaveForm>
 
       {isEdit && p ? (
         <>
@@ -267,7 +268,11 @@ export function ProductEditorForm({ product }: Props) {
               ) : (
                 <p className="text-sm text-neutral-500">Belum ada file MSDS.</p>
               )}
-              <form action={uploadProductMsds} className="mt-4 flex flex-wrap items-end gap-4 border-t border-neutral-100 pt-4">
+              <AdminSaveForm
+                action={uploadProductMsds}
+                className="mt-4 flex flex-wrap items-end gap-4 border-t border-neutral-100 pt-4"
+                successMessage="MSDS berhasil diunggah."
+              >
                 <input type="hidden" name="product_id" value={p.id} />
                 <div>
                   <label htmlFor="msds-file" className={adminLabel}>
@@ -285,7 +290,7 @@ export function ProductEditorForm({ product }: Props) {
                 <button type="submit" className={outlineBtn}>
                   Upload / ganti MSDS
                 </button>
-              </form>
+              </AdminSaveForm>
             </div>
           </section>
 

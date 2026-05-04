@@ -2,11 +2,19 @@
 
 import { useState } from "react";
 import { resetSiteConfigSection, updateSiteConfigIndustries } from "@/actions/admin";
+import { AdminSaveForm } from "@/components/admin/admin-save-form";
+import { IndustryIcon } from "@/components/industry-icon";
+import {
+  effectiveIconKeyForEditor,
+  INDUSTRY_ICON_OPTIONS,
+  normalizeIndustryItemsForEditor,
+  type IndustryIconKey,
+} from "@/lib/industry-icon-keys";
 import { adminDangerLink, adminInput, adminLabel, adminPrimaryBtn, adminSecondaryBtn } from "@/lib/admin-ui";
 import type { IndustryItem } from "@/types/database";
 
 function blankItem(): IndustryItem {
-  return { key: `sector-${Date.now()}`, name: "Sektor baru", summary: "" };
+  return { key: `sector-${Date.now()}`, name: "Sektor baru", summary: "", icon_key: "flask" };
 }
 
 type Props = {
@@ -15,7 +23,7 @@ type Props = {
 
 export function IndustriesSectionEditor({ initial }: Props) {
   const [items, setItems] = useState<IndustryItem[]>(() =>
-    initial.length > 0 ? initial.map((x) => ({ ...x })) : [blankItem()],
+    initial.length > 0 ? normalizeIndustryItemsForEditor(initial.map((x) => ({ ...x }))) : [blankItem()],
   );
 
   function updateAt(index: number, patch: Partial<IndustryItem>) {
@@ -31,7 +39,8 @@ export function IndustriesSectionEditor({ initial }: Props) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-neutral-600">
-        Tambah, ubah, atau hapus sektor. Key dipakai untuk URL/ikon — gunakan huruf kecil dan tanda hubung.
+        Tambah, ubah, atau hapus sektor. <strong>Key</strong> dipakai sebagai identitas (huruf kecil, tanda hubung).{" "}
+        <strong>Simbol</strong> menentukan gambar ikon di kartu beranda — pilih yang paling mewakili sektor.
       </p>
 
       <ul className="space-y-4">
@@ -67,6 +76,26 @@ export function IndustriesSectionEditor({ initial }: Props) {
                   onChange={(e) => updateAt(i, { name: e.target.value })}
                 />
               </div>
+              <div className="sm:col-span-1">
+                <label className={adminLabel}>Simbol / ikon</label>
+                <div className="mt-1 flex flex-wrap items-center gap-3">
+                  <select
+                    className={`${adminInput} min-w-0 flex-1`}
+                    value={effectiveIconKeyForEditor(row)}
+                    onChange={(e) => updateAt(i, { icon_key: e.target.value as IndustryIconKey })}
+                  >
+                    {INDUSTRY_ICON_OPTIONS.map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                  <IndustryIcon industryKey={effectiveIconKeyForEditor(row)} className="h-9 w-9 shrink-0" />
+                </div>
+                <p className="mt-1.5 text-xs text-neutral-500">
+                  Tampil di blok &quot;Sektor yang dilayani&quot; di beranda. Key boleh unik; simbol pilih dari daftar.
+                </p>
+              </div>
               <div className="sm:col-span-3">
                 <label className={adminLabel}>Ringkasan</label>
                 <textarea
@@ -90,18 +119,26 @@ export function IndustriesSectionEditor({ initial }: Props) {
       </button>
 
       <div className="flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <form action={updateSiteConfigIndustries} className="w-full sm:w-auto">
+        <AdminSaveForm
+          action={updateSiteConfigIndustries}
+          className="w-full sm:w-auto"
+          successMessage="Daftar industri disimpan."
+        >
           <input type="hidden" name="industries_json" value={JSON.stringify(items)} />
           <button type="submit" className={`${adminPrimaryBtn} w-full sm:w-auto`}>
             Simpan bagian ini
           </button>
-        </form>
-        <form action={resetSiteConfigSection} className="w-full sm:w-auto">
+        </AdminSaveForm>
+        <AdminSaveForm
+          action={resetSiteConfigSection}
+          className="w-full sm:w-auto"
+          successMessage="Industri dikembalikan ke nilai bawaan."
+        >
           <input type="hidden" name="section" value="industries" />
           <button type="submit" className={`${adminSecondaryBtn} w-full sm:w-auto`} title="Kembalikan daftar ke template bawaan">
             Reset ke default
           </button>
-        </form>
+        </AdminSaveForm>
       </div>
     </div>
   );

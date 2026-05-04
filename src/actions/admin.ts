@@ -6,6 +6,7 @@ import { z } from "zod";
 import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
 import { parseGalleryImages } from "@/lib/product-gallery";
 import { throwIfMissingGalleryColumn } from "@/lib/supabase-errors";
+import { INDUSTRY_ICON_KEYS } from "@/lib/industry-icon-keys";
 import { slugify } from "@/lib/slugify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -82,6 +83,7 @@ const industryItemSchema = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
   summary: z.string(),
+  icon_key: z.enum(INDUSTRY_ICON_KEYS).optional(),
 });
 
 function parseIndustriesPayload(raw: string) {
@@ -245,7 +247,8 @@ export async function resetSiteConfigSection(formData: FormData): Promise<void> 
 }
 
 /** Buat baris site_config utama dari template (jika belum ada). */
-export async function createSiteConfigRow(): Promise<void> {
+export async function createSiteConfigRow(formData?: FormData): Promise<void> {
+  void formData;
   const supabase = await requireAdmin();
   if (!supabase) throw new Error("Unauthorized");
   const { data: existing } = await supabase

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { deleteServiceForm, upsertService } from "@/actions/admin";
 import {
   adminDangerZoneButton,
@@ -23,6 +24,9 @@ const ICON_OPTIONS = [
   ["manufacturing", "Manufacturing"],
   ["mining", "Mining"],
   ["water", "Water"],
+  ["household", "Household"],
+  ["autocare", "Autocare"],
+  ["household-autocare", "Household & Autocare (legacy)"],
 ] as const;
 
 type Props = {
@@ -65,7 +69,7 @@ export function ServiceEditorForm({ service }: Props) {
         )}
       </div>
 
-      <form action={upsertService} className="space-y-8">
+      <AdminSaveForm action={upsertService} className="space-y-8" successMessage="Layanan berhasil disimpan.">
         {isEdit && s ? <input type="hidden" name="id" value={s.id} /> : null}
 
         <AdminFormSection
@@ -214,7 +218,7 @@ export function ServiceEditorForm({ service }: Props) {
             {isEdit ? "Simpan perubahan" : "Simpan layanan"}
           </button>
         </div>
-      </form>
+      </AdminSaveForm>
 
       {isEdit && s ? (
         <aside className="mt-8 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">

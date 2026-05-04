@@ -2,6 +2,8 @@ export type IndustryItem = {
   key: string;
   name: string;
   summary: string;
+  /** Kunci SVG di `IndustryIcon`. Jika tidak diisi, halaman publik memakai `key` bila itu kunci ikon yang dikenal. */
+  icon_key?: string;
 };
 
 export type SiteConfig = {
