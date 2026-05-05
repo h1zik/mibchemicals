@@ -167,7 +167,7 @@ export default async function HomePage() {
               Katalog lengkap →
             </Link>
           </ScrollReveal>
-          <ul className="mt-10 grid gap-6 sm:grid-cols-2">
+          <ul className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
             {featured.length === 0 ? (
               <li className="text-neutral-500">
                 Belum ada produk unggulan. Hubungkan Supabase atau tambahkan data di dashboard.
@@ -183,17 +183,19 @@ export default async function HomePage() {
                         className="flex h-full flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm transition hover:border-mib hover:shadow-md"
                       >
                         {thumb ? (
-                          <div className="relative aspect-[16/9] w-full shrink-0 bg-neutral-100">
+                          <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-neutral-100">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={thumb}
                               alt=""
-                              className="h-full w-full object-cover"
+                              className="h-full w-full object-cover object-center"
                             />
                           </div>
                         ) : null}
                         <div className="p-6">
-                          <p className="text-xs font-semibold uppercase text-mib">{p.category}</p>
+                          <p className="text-xs font-semibold uppercase text-mib">
+                            {p.product_category?.name ?? "—"}
+                          </p>
                           <h3 className="mt-2 text-xl font-bold text-foreground">{p.name}</h3>
                           <p className="mt-2 line-clamp-2 text-sm text-neutral-600">{p.description_md}</p>
                         </div>
@@ -239,22 +241,23 @@ export default async function HomePage() {
                       className="flex h-full flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm transition hover:border-mib hover:shadow-md"
                     >
                       {post.cover_image_url ? (
-                        <div className="relative aspect-[16/10] w-full shrink-0 bg-neutral-100">
+                        <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-neutral-100">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={post.cover_image_url}
                             alt=""
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-cover object-center"
                           />
                         </div>
                       ) : (
-                        <div className="flex aspect-[16/10] w-full items-center justify-center bg-neutral-100 text-sm font-semibold text-neutral-400">
+                        <div className="flex aspect-square w-full items-center justify-center bg-neutral-100 text-sm font-semibold text-neutral-400">
                           MIB
                         </div>
                       )}
                       <div className="flex flex-1 flex-col p-5">
                         <p className="text-xs font-semibold uppercase text-mib">
-                          {post.post_type === "case_study" ? "Studi kasus" : "Berita"}
+                          {post.post_category?.name ??
+                            (post.post_type === "case_study" ? "Studi kasus" : "Berita")}
                         </p>
                         <h3 className="mt-2 text-lg font-bold leading-snug text-foreground">{post.title}</h3>
                         <p className="mt-2 line-clamp-2 flex-1 text-sm text-neutral-600">{post.excerpt}</p>

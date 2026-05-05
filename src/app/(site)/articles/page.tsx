@@ -31,22 +31,25 @@ export default async function ArticlesPage() {
         ) : (
           posts.map((post) => (
             <li key={post.id}>
-              <article className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm sm:flex-row">
+              <article className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm sm:flex-row sm:items-start">
                 {post.cover_image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={post.cover_image_url}
-                    alt=""
-                    className="h-40 w-full rounded object-cover sm:h-32 sm:w-48 sm:shrink-0"
-                  />
+                  <div className="relative aspect-square w-full shrink-0 overflow-hidden rounded-lg bg-neutral-100 sm:w-44">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={post.cover_image_url}
+                      alt=""
+                      className="h-full w-full object-cover object-center"
+                    />
+                  </div>
                 ) : (
-                  <div className="flex h-40 w-full items-center justify-center rounded bg-neutral-100 text-neutral-400 sm:h-32 sm:w-48 sm:shrink-0">
+                  <div className="flex aspect-square w-full shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-400 sm:w-44">
                     MIB
                   </div>
                 )}
                 <div>
                   <p className="text-xs font-semibold uppercase text-mib">
-                    {post.post_type === "case_study" ? "Studi kasus" : "Berita"}
+                    {post.post_category?.name ??
+                      (post.post_type === "case_study" ? "Studi kasus" : "Berita")}
                   </p>
                   <h2 className="mt-1 text-2xl font-bold text-foreground">
                     <Link href={`/articles/${post.slug}`} className="hover:text-mib">

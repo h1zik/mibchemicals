@@ -9,7 +9,7 @@ export default async function AdminPostsPage() {
   const supabase = createSupabaseServerClient();
   const { data: posts } = await supabase
     .from("posts")
-    .select("*")
+    .select("id, title, slug, published, post_type, updated_at, post_categories ( name )")
     .order("updated_at", { ascending: false });
 
   const list = posts ?? [];
@@ -36,7 +36,11 @@ export default async function AdminPostsPage() {
         </div>
       ) : (
         <ul className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-sm">
-          {list.map((p) => (
+          {list.map((p) => {
+            const categoryName =
+              (p as { post_categories?: { name?: string | null } | null }).post_categories?.name
+                ?.trim() || null;
+            return (
             <li
               key={p.id}
               className="flex flex-col gap-4 p-4 transition hover:bg-neutral-50/80 sm:flex-row sm:items-center sm:justify-between sm:p-5"
@@ -45,6 +49,11 @@ export default async function AdminPostsPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-semibold text-neutral-900">{p.title}</p>
                   <AdminStatusBadge published={Boolean(p.published)} />
+                  {categoryName ? (
+                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">
+                      {categoryName}
+                    </span>
+                  ) : null}
                   <span className="inline-flex rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-800 ring-1 ring-inset ring-violet-600/15">
                     {p.post_type}
                   </span>
@@ -63,7 +72,8 @@ export default async function AdminPostsPage() {
                 </form>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </div>

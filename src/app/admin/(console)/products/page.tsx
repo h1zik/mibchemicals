@@ -9,7 +9,7 @@ export default async function AdminProductsPage() {
   const supabase = createSupabaseServerClient();
   const { data: products } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, slug, published, sort_order, msds_bucket_path, product_categories ( name )")
     .order("sort_order", { ascending: true });
 
   const list = products ?? [];
@@ -36,7 +36,11 @@ export default async function AdminProductsPage() {
         </div>
       ) : (
         <ul className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-sm">
-          {list.map((p) => (
+          {list.map((p) => {
+            const categoryName =
+              (p as { product_categories?: { name?: string | null } | null }).product_categories?.name
+                ?.trim() || null;
+            return (
             <li
               key={p.id}
               className="flex flex-col gap-4 p-4 transition hover:bg-neutral-50/80 sm:flex-row sm:items-center sm:justify-between sm:p-5"
@@ -44,6 +48,11 @@ export default async function AdminProductsPage() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-semibold text-neutral-900">{p.name}</p>
+                  {categoryName ? (
+                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">
+                      {categoryName}
+                    </span>
+                  ) : null}
                   <AdminStatusBadge published={Boolean(p.published)} />
                   {p.msds_bucket_path ? (
                     <span className="inline-flex rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-800 ring-1 ring-inset ring-sky-600/15">
@@ -65,7 +74,8 @@ export default async function AdminProductsPage() {
                 </form>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </div>

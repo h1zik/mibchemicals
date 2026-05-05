@@ -54,11 +54,22 @@ export type Service = {
   updated_at: string;
 };
 
+export type ProductCategory = {
+  id: string;
+  slug: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Product = {
   id: string;
   slug: string;
   name: string;
-  category: string;
+  category_id: string;
+  /** Dari join Supabase `product_categories`; kosong jika relasi tidak di-select. */
+  product_category: Pick<ProductCategory, "id" | "name" | "slug"> | null;
   description_md: string;
   specs_json: Record<string, string>;
   /** Galeri: item dengan `path` (bucket product-gallery) atau `url` absolut */
@@ -70,6 +81,15 @@ export type Product = {
   published: boolean;
   seo_title: string | null;
   seo_description: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PostCategory = {
+  id: string;
+  slug: string;
+  name: string;
+  sort_order: number;
   created_at: string;
   updated_at: string;
 };
@@ -87,6 +107,9 @@ export type Post = {
   seo_title: string | null;
   seo_description: string | null;
   author_name: string;
+  category_id: string;
+  /** Dari join Supabase `post_categories` */
+  post_category: Pick<PostCategory, "id" | "name" | "slug"> | null;
   created_at: string;
   updated_at: string;
 };

@@ -14,15 +14,16 @@ import {
   adminMutedLink,
   adminPrimaryBtn,
 } from "@/lib/admin-ui";
-import type { Product } from "@/types/database";
+import type { Product, ProductCategory } from "@/types/database";
 
 const DEFAULT_SPECS = '{\n  "appearance": "",\n  "pH": ""\n}';
 
 type Props = {
   product?: Product | null;
+  categories: ProductCategory[];
 };
 
-export function ProductEditorForm({ product }: Props) {
+export function ProductEditorForm({ product, categories }: Props) {
   const isEdit = Boolean(product);
   const p = product ?? undefined;
   const publicPath = p?.slug ? `/products/${p.slug}` : null;
@@ -61,6 +62,18 @@ export function ProductEditorForm({ product }: Props) {
             Nama, kategori, deskripsi Markdown, spesifikasi JSON, dan galeri. Slug opsional saat baru.
           </p>
         )}
+        {categories.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
+            <p className="font-semibold">Belum ada kategori produk</p>
+            <p className="mt-1 text-amber-900/90">
+              Buat minimal satu kategori di{" "}
+              <Link href="/admin/product-categories" className="font-semibold underline hover:no-underline">
+                Kategori produk
+              </Link>{" "}
+              sebelum menyimpan produk.
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <AdminSaveForm action={upsertProduct} className="space-y-8" successMessage="Produk berhasil disimpan.">
@@ -94,14 +107,32 @@ export function ProductEditorForm({ product }: Props) {
             <label htmlFor="prd-cat" className={adminLabel}>
               Kategori
             </label>
-            <input
+            <select
               id="prd-cat"
-              name="category"
+              name="category_id"
               required
-              defaultValue={p?.category}
+              defaultValue={p?.category_id ?? categories[0]?.id ?? ""}
               className={adminInput}
-              placeholder="Contoh: Solvent"
-            />
+            >
+              {categories.length === 0 ? (
+                <option value="" disabled>
+                  — Belum ada kategori —
+                </option>
+              ) : (
+                categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))
+              )}
+            </select>
+            <p className="mt-1.5 text-xs text-neutral-500">
+              Kelola daftar di{" "}
+              <Link href="/admin/product-categories" className="font-semibold text-mib hover:underline">
+                Kategori produk
+              </Link>
+              .
+            </p>
           </div>
           <div className="!mt-6 border-t border-neutral-100 pt-6">
             <AdminMarkdownEditor

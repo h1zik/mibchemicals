@@ -28,7 +28,7 @@ export default async function ProductsPage() {
           </p>
         </header>
       </ScrollReveal>
-      <ul className="mt-12 grid gap-6 sm:grid-cols-2">
+      <ul className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
         {products.length === 0 ? (
           <li className="col-span-full rounded border border-dashed border-neutral-300 p-8 text-neutral-600">
             Belum ada produk. Hubungkan database atau tambahkan dari admin.
@@ -43,15 +43,27 @@ export default async function ProductsPage() {
                     href={`/products/${p.slug}`}
                     className="flex h-full flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm transition hover:border-mib"
                   >
-                    {thumb ? (
-                      <div className="aspect-[16/9] w-full shrink-0 bg-neutral-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={thumb} alt="" className="h-full w-full object-cover" />
-                      </div>
-                    ) : null}
+                    <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-neutral-100">
+                      {thumb ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={thumb}
+                            alt=""
+                            className="h-full w-full object-cover object-center"
+                          />
+                        </>
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-neutral-400">
+                          MIB
+                        </div>
+                      )}
+                    </div>
                     <div className="p-6">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-xs font-semibold uppercase text-mib">{p.category}</p>
+                        <p className="text-xs font-semibold uppercase text-mib">
+                          {p.product_category?.name ?? "—"}
+                        </p>
                         {p.featured ? (
                           <span className="rounded bg-mib/10 px-2 py-0.5 text-xs font-semibold text-mib">
                             Featured

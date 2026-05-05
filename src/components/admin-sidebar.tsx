@@ -6,6 +6,8 @@ import {
   LayoutDashboard,
   Briefcase,
   Package,
+  Tags,
+  BookMarked,
   Newspaper,
   Inbox,
   Settings,
@@ -16,7 +18,9 @@ const links = [
   { href: "/admin", label: "Ringkasan", icon: LayoutDashboard },
   { href: "/admin/services", label: "Layanan", icon: Briefcase },
   { href: "/admin/products", label: "Produk", icon: Package },
+  { href: "/admin/product-categories", label: "Kategori produk", icon: Tags },
   { href: "/admin/posts", label: "Artikel", icon: Newspaper },
+  { href: "/admin/post-categories", label: "Kategori artikel", icon: BookMarked },
   { href: "/admin/leads", label: "Leads", icon: Inbox },
   { href: "/admin/settings", label: "Pengaturan", icon: Settings },
 ] as const;

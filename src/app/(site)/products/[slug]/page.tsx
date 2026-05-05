@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { MarkdownBody } from "@/components/markdown-body";
 import { ProductGallery } from "@/components/product-gallery";
 import { ScrollReveal } from "@/components/scroll-reveal";
-import { getMsdsPublicUrl, getProductBySlug, getSiteConfig } from "@/lib/data/queries";
+import { getMsdsPublicUrl, getProductBySlug, getSimilarProducts, getSiteConfig } from "@/lib/data/queries";
+import { SimilarProductsSection } from "@/components/similar-products";
 import { buildPageMetadata } from "@/lib/metadata";
 
 type Props = { params: { slug: string } };
@@ -29,8 +30,10 @@ export default async function ProductDetailPage({ params }: Props) {
 
   const msdsUrl = getMsdsPublicUrl(product.msds_bucket_path);
   const specs = Object.entries(product.specs_json ?? {});
+  const similarProducts = await getSimilarProducts(product.category_id, product.id, 4);
 
   return (
+    <>
     <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <ScrollReveal>
         <nav aria-label="Breadcrumb" className="text-sm text-neutral-500">
@@ -45,7 +48,9 @@ export default async function ProductDetailPage({ params }: Props) {
           </ol>
         </nav>
         <header className="mt-6">
-          <p className="text-sm font-semibold uppercase text-mib">{product.category}</p>
+          <p className="text-sm font-semibold uppercase text-mib">
+            {product.product_category?.name ?? "—"}
+          </p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-foreground">{product.name}</h1>
         </header>
       </ScrollReveal>
@@ -101,5 +106,10 @@ export default async function ProductDetailPage({ params }: Props) {
         </Link>
       </ScrollReveal>
     </article>
+    <SimilarProductsSection
+      products={similarProducts}
+      categoryName={product.product_category?.name}
+    />
+    </>
   );
 }

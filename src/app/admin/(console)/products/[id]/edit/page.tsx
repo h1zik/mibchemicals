@@ -1,19 +1,17 @@
 import { notFound } from "next/navigation";
 import { ProductEditorForm } from "@/components/admin/product-editor-form";
-import { parseGalleryImages } from "@/lib/product-gallery";
+import { getProductCategories, mapProductRow, PRODUCT_LIST_SELECT } from "@/lib/data/queries";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { Product } from "@/types/database";
 
 type Props = { params: { id: string } };
 
 export default async function EditProductPage({ params }: Props) {
   const supabase = createSupabaseServerClient();
-  const { data } = await supabase.from("products").select("*").eq("id", params.id).maybeSingle();
+  const [{ data }, categories] = await Promise.all([
+    supabase.from("products").select(PRODUCT_LIST_SELECT).eq("id", params.id).maybeSingle(),
+    getProductCategories(),
+  ]);
   if (!data) notFound();
-  const raw = data as Record<string, unknown>;
-  const product = {
-    ...data,
-    gallery_images: parseGalleryImages(raw.gallery_images),
-  } as Product;
-  return <ProductEditorForm product={product} />;
+  const product = mapProductRow(data as Record<string, unknown>);
+  return <ProductEditorForm product={product} categories={categories} />;
 }

@@ -33,6 +33,14 @@ function revalidatePublic() {
   revalidatePath("/contact");
 }
 
+function revalidateProductCategoriesAdmin() {
+  revalidatePath("/admin/product-categories");
+}
+
+function revalidatePostCategoriesAdmin() {
+  revalidatePath("/admin/post-categories");
+}
+
 function revalidateSettings() {
   revalidatePath("/admin/settings");
   revalidatePublic();
@@ -367,7 +375,7 @@ const productSchema = z.object({
   id: z.string().uuid().optional(),
   slug: z.string().min(1),
   name: z.string().min(1),
-  category: z.string().min(1),
+  category_id: z.string().uuid(),
   description_md: z.string(),
   specs_json: z.string(),
   gallery_images_json: z.string(),
@@ -376,6 +384,13 @@ const productSchema = z.object({
   published: z.coerce.boolean(),
   seo_title: z.string().optional(),
   seo_description: z.string().optional(),
+});
+
+const productCategorySchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  sort_order: z.coerce.number().int(),
 });
 
 export async function upsertProduct(formData: FormData): Promise<void> {
@@ -405,7 +420,7 @@ export async function upsertProduct(formData: FormData): Promise<void> {
     id: id || undefined,
     slug,
     name,
-    category: String(formData.get("category") ?? ""),
+    category_id: String(formData.get("category_id") ?? ""),
     description_md: String(formData.get("description_md") ?? ""),
     specs_json: specsRaw,
     gallery_images_json: galleryRaw,
@@ -420,7 +435,7 @@ export async function upsertProduct(formData: FormData): Promise<void> {
   const row = {
     slug: parsed.data.slug,
     name: parsed.data.name,
-    category: parsed.data.category,
+    category_id: parsed.data.category_id,
     description_md: parsed.data.description_md,
     specs_json: specs,
     gallery_images,
@@ -446,12 +461,74 @@ export async function upsertProduct(formData: FormData): Promise<void> {
       throwIfMissingGalleryColumn(error);
       throw new Error(error.message);
     }
+    revalidatePath("/", "layout");
     revalidatePath("/products");
     revalidatePath("/admin/products");
     redirect("/admin/products");
   }
+  revalidatePath("/", "layout");
   revalidatePath("/products");
   revalidatePath("/admin/products");
+}
+
+export async function upsertProductCategory(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = formData.get("id") as string | null;
+  const name = String(formData.get("name") ?? "");
+  let slug = String(formData.get("slug") ?? "").trim();
+  if (!slug) slug = slugify(name);
+  const parsed = productCategorySchema.safeParse({
+    id: id || undefined,
+    slug,
+    name,
+    sort_order: formData.get("sort_order") ?? 0,
+  });
+  if (!parsed.success) throw new Error(parsed.error.message);
+
+  const row = {
+    slug: parsed.data.slug,
+    name: parsed.data.name,
+    sort_order: parsed.data.sort_order,
+  };
+
+  if (parsed.data.id) {
+    const { error } = await supabase
+      .from("product_categories")
+      .update(row)
+      .eq("id", parsed.data.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase.from("product_categories").insert(row);
+    if (error) throw new Error(error.message);
+    revalidateProductCategoriesAdmin();
+    revalidatePublic();
+    redirect("/admin/product-categories");
+  }
+  revalidateProductCategoriesAdmin();
+  revalidatePublic();
+}
+
+export async function deleteProductCategoryForm(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = String(formData.get("id") ?? "");
+  if (!z.string().uuid().safeParse(id).success) throw new Error("ID tidak valid");
+  const { count, error: countErr } = await supabase
+    .from("products")
+    .select("*", { count: "exact", head: true })
+    .eq("category_id", id);
+  if (countErr) throw new Error(countErr.message);
+  if (count != null && count > 0) {
+    throw new Error(
+      `Tidak dapat menghapus kategori: masih dipakai oleh ${count} produk. Pindahkan produk ke kategori lain dulu.`
+    );
+  }
+  const { error } = await supabase.from("product_categories").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidateProductCategoriesAdmin();
+  revalidatePublic();
+  redirect("/admin/product-categories");
 }
 
 export async function deleteProductForm(formData: FormData): Promise<void> {
@@ -461,6 +538,7 @@ export async function deleteProductForm(formData: FormData): Promise<void> {
   if (!z.string().uuid().safeParse(id).success) throw new Error("ID tidak valid");
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  revalidatePath("/", "layout");
   revalidatePath("/products");
   revalidatePath("/admin/products");
   redirect("/admin/products");
@@ -474,11 +552,19 @@ const postSchema = z.object({
   body_md: z.string(),
   cover_image_url: z.string().optional(),
   post_type: z.enum(["news", "case_study"]),
+  category_id: z.string().uuid(),
   published: z.coerce.boolean(),
   published_at: z.string().optional(),
   seo_title: z.string().optional(),
   seo_description: z.string().optional(),
   author_name: z.string().min(1),
+});
+
+const postCategorySchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  sort_order: z.coerce.number().int(),
 });
 
 export async function upsertPost(formData: FormData): Promise<void> {
@@ -500,6 +586,7 @@ export async function upsertPost(formData: FormData): Promise<void> {
     body_md: String(formData.get("body_md") ?? ""),
     cover_image_url: formData.get("cover_image_url") || undefined,
     post_type: formData.get("post_type") ?? "news",
+    category_id: String(formData.get("category_id") ?? ""),
     published,
     published_at: publishedAtRaw ?? undefined,
     seo_title: formData.get("seo_title") || undefined,
@@ -519,6 +606,7 @@ export async function upsertPost(formData: FormData): Promise<void> {
     body_md: parsed.data.body_md,
     cover_image_url: parsed.data.cover_image_url ?? null,
     post_type: parsed.data.post_type,
+    category_id: parsed.data.category_id,
     published: parsed.data.published,
     published_at,
     seo_title: parsed.data.seo_title ?? null,
@@ -534,13 +622,75 @@ export async function upsertPost(formData: FormData): Promise<void> {
     if (error) throw new Error(error.message);
     if (!inserted?.id) throw new Error("Gagal membuat artikel");
     revalidatePath("/articles");
+    revalidatePath(`/articles/${parsed.data.slug}`);
     revalidatePath("/admin/posts");
     revalidatePublic();
     redirect(`/admin/posts/${inserted.id}/edit`);
   }
   revalidatePath("/articles");
+  revalidatePath(`/articles/${parsed.data.slug}`);
   revalidatePath("/admin/posts");
   revalidatePublic();
+}
+
+export async function upsertPostCategory(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = formData.get("id") as string | null;
+  const name = String(formData.get("name") ?? "");
+  let slug = String(formData.get("slug") ?? "").trim();
+  if (!slug) slug = slugify(name);
+  const parsed = postCategorySchema.safeParse({
+    id: id || undefined,
+    slug,
+    name,
+    sort_order: formData.get("sort_order") ?? 0,
+  });
+  if (!parsed.success) throw new Error(parsed.error.message);
+
+  const row = {
+    slug: parsed.data.slug,
+    name: parsed.data.name,
+    sort_order: parsed.data.sort_order,
+  };
+
+  if (parsed.data.id) {
+    const { error } = await supabase
+      .from("post_categories")
+      .update(row)
+      .eq("id", parsed.data.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase.from("post_categories").insert(row);
+    if (error) throw new Error(error.message);
+    revalidatePostCategoriesAdmin();
+    revalidatePublic();
+    redirect("/admin/post-categories");
+  }
+  revalidatePostCategoriesAdmin();
+  revalidatePublic();
+}
+
+export async function deletePostCategoryForm(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = String(formData.get("id") ?? "");
+  if (!z.string().uuid().safeParse(id).success) throw new Error("ID tidak valid");
+  const { count, error: countErr } = await supabase
+    .from("posts")
+    .select("*", { count: "exact", head: true })
+    .eq("category_id", id);
+  if (countErr) throw new Error(countErr.message);
+  if (count != null && count > 0) {
+    throw new Error(
+      `Tidak dapat menghapus kategori: masih dipakai oleh ${count} artikel. Pindahkan artikel ke kategori lain dulu.`
+    );
+  }
+  const { error } = await supabase.from("post_categories").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePostCategoriesAdmin();
+  revalidatePublic();
+  redirect("/admin/post-categories");
 }
 
 export async function deletePostForm(formData: FormData): Promise<void> {
