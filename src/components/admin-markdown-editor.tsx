@@ -44,7 +44,7 @@ function getEditorTextarea(root: HTMLElement | null): HTMLTextAreaElement | null
 }
 
 /** Sembunyikan perintah gambar bawaan (placeholder `url` membingungkan); diganti panel unggah. */
-function filterToolbarCommands(cmd: ICommand, _isExtra: boolean): false | ICommand {
+function filterToolbarCommands(cmd: ICommand): false | ICommand {
   if (cmd.keyCommand === "image") return false;
   return cmd;
 }
