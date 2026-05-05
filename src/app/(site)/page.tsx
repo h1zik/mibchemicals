@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { IndustryIcon } from "@/components/industry-icon";
 import { ScrollReveal } from "@/components/scroll-reveal";
+import { HeroManufacturingVisual } from "@/components/hero-manufacturing-visual";
 import { SolutionSection } from "@/components/solution-section";
 import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
 import { resolveIndustryIconKey } from "@/lib/industry-icon-keys";
@@ -49,28 +50,31 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ScrollReveal className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-          <p className="text-sm font-semibold uppercase tracking-wider text-mib">
-            B2B · Oil & Gas · Manufacturing · Mining · Water Treatment
-          </p>
-          <h1 className="mt-4 text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            {config.hero_title}
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg text-neutral-600">{config.hero_subtitle}</p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              href={config.hero_primary_cta_url}
-              className="inline-flex items-center justify-center rounded border-2 border-mib bg-mib px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-mib-dark"
-            >
-              {config.hero_primary_cta_label}
-            </Link>
-            <Link
-              href={config.hero_secondary_cta_url}
-              className="inline-flex items-center justify-center rounded border-2 border-mib px-6 py-3 text-base font-semibold text-mib transition hover:bg-mib/5"
-            >
-              {config.hero_secondary_cta_label}
-            </Link>
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[minmax(0,1fr)_440px]">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-mib">
+              B2B · Oil & Gas · Manufacturing · Mining · Water Treatment
+            </p>
+            <h1 className="mt-4 text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              {config.hero_title}
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg text-neutral-600">{config.hero_subtitle}</p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link
+                href={config.hero_primary_cta_url}
+                className="inline-flex items-center justify-center rounded border-2 border-mib bg-mib px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-mib-dark"
+              >
+                {config.hero_primary_cta_label}
+              </Link>
+              <Link
+                href={config.hero_secondary_cta_url}
+                className="inline-flex items-center justify-center rounded border-2 border-mib px-6 py-3 text-base font-semibold text-mib transition hover:bg-mib/5"
+              >
+                {config.hero_secondary_cta_label}
+              </Link>
+            </div>
           </div>
+          <HeroManufacturingVisual />
         </div>
       </ScrollReveal>
 
