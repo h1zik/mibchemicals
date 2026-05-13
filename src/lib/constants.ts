@@ -57,6 +57,13 @@ export const FALLBACK_SITE_CONFIG: SiteConfig = {
   ],
   nav_logo_url: null,
   favicon_url: null,
+  about_page_title: "Tentang kami",
+  about_page_subtitle:
+    "Specialty chemicals dan maklon kimia industri — mitra formulasi untuk operasi B2B Anda.",
+  about_page_body_md:
+    "## Visi kami\n\nMenjadi mitra specialty chemicals dan maklon kimia industri yang andal untuk kebutuhan B2B.\n\n## Yang kami lakukan\n\nKami mendampingi formulasi, skala produksi, dan implementasi di lapangan — dari assessment hingga delivery.",
+  about_page_seo_title: null,
+  about_page_seo_description: null,
 };
 
 export const siteUrl =

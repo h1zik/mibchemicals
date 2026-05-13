@@ -1,5 +1,6 @@
 import {
   createSiteConfigRow,
+  updateSiteConfigAbout,
   updateSiteConfigBranding,
   updateSiteConfigCompany,
   updateSiteConfigHero,
@@ -7,6 +8,7 @@ import {
   updateSiteConfigSolutions,
 } from "@/actions/admin";
 import { AdminBrandingUploads } from "@/components/admin-branding-uploads";
+import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { AdminSettingsFormFooter } from "@/components/admin/admin-settings-form-footer";
@@ -120,6 +122,60 @@ export default async function AdminSettingsPage() {
             </div>
           </AdminSaveForm>
           <AdminSettingsFormFooter formId="settings-company" section="company" />
+        </AdminSettingsSection>
+
+        <AdminSettingsSection
+          title="Halaman Tentang kami"
+          description="Konten untuk rute /about — judul, subjudul, isi Markdown, dan meta SEO opsional."
+        >
+          <AdminSaveForm
+            id="settings-about"
+            action={updateSiteConfigAbout}
+            className="space-y-4"
+            successMessage="Halaman Tentang kami disimpan."
+          >
+            <div>
+              <label className={adminLabel}>Judul halaman</label>
+              <input name="about_page_title" defaultValue={cfg.about_page_title} className={adminInput} />
+            </div>
+            <div>
+              <label className={adminLabel}>Subjudul</label>
+              <textarea
+                name="about_page_subtitle"
+                rows={2}
+                defaultValue={cfg.about_page_subtitle}
+                className={adminInput}
+              />
+            </div>
+            <AdminMarkdownEditor
+              name="about_page_body_md"
+              label="Isi halaman (Markdown)"
+              defaultValue={cfg.about_page_body_md}
+              height={420}
+              preview="live"
+              helpText="Gambar di isi artikel: unggah memakai draft_key (aman untuk halaman statis). Bisa juga menempel URL gambar."
+            />
+            <div>
+              <label className={adminLabel}>Meta title (opsional)</label>
+              <input
+                name="about_page_seo_title"
+                defaultValue={cfg.about_page_seo_title ?? ""}
+                placeholder="Kosongkan = pakai judul halaman"
+                className={adminInput}
+              />
+            </div>
+            <div>
+              <label className={adminLabel}>Meta description (opsional)</label>
+              <textarea
+                name="about_page_seo_description"
+                rows={2}
+                defaultValue={cfg.about_page_seo_description ?? ""}
+                placeholder="Kosongkan = pakai subjudul atau ringkasan default"
+                className={adminInput}
+              />
+            </div>
+          </AdminSaveForm>
+          <AdminSettingsFormFooter formId="settings-about" section="about" />
         </AdminSettingsSection>
 
         <AdminSettingsSection

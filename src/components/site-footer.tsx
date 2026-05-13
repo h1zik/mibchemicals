@@ -33,6 +33,11 @@ export function SiteFooter({ config }: { config: SiteConfig }) {
           </p>
           <ul className="mt-2 space-y-2 text-sm">
             <li>
+              <Link href="/about" className="text-neutral-700 hover:text-mib">
+                Tentang kami
+              </Link>
+            </li>
+            <li>
               <Link href="/articles" className="text-neutral-700 hover:text-mib">
                 Artikel & studi kasus
               </Link>

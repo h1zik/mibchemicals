@@ -10,7 +10,8 @@ export type SiteConfigSectionKey =
   | "hero"
   | "solutions"
   | "industries"
-  | "branding";
+  | "branding"
+  | "about";
 
 type Props = {
   formId: string;

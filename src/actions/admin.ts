@@ -31,6 +31,7 @@ function revalidatePublic() {
   revalidatePath("/products");
   revalidatePath("/articles");
   revalidatePath("/contact");
+  revalidatePath("/about");
 }
 
 function revalidateProductCategoriesAdmin() {
@@ -53,6 +54,7 @@ const siteConfigSectionKey = z.enum([
   "solutions",
   "industries",
   "branding",
+  "about",
 ]);
 
 const seoSectionSchema = z.object({
@@ -86,6 +88,22 @@ const solutionsSectionSchema = z.object({
   solution_mib_title: z.string().min(1),
   solution_mib_body: z.string(),
 });
+
+const aboutPageSectionSchema = z
+  .object({
+    about_page_title: z.string().min(1),
+    about_page_subtitle: z.string(),
+    about_page_body_md: z.string(),
+    about_page_seo_title: z.string(),
+    about_page_seo_description: z.string(),
+  })
+  .transform((d) => ({
+    about_page_title: d.about_page_title.trim(),
+    about_page_subtitle: d.about_page_subtitle.trim(),
+    about_page_body_md: d.about_page_body_md,
+    about_page_seo_title: d.about_page_seo_title.trim() || null,
+    about_page_seo_description: d.about_page_seo_description.trim() || null,
+  }));
 
 const industryItemSchema = z.object({
   key: z.string().min(1),
@@ -168,6 +186,29 @@ export async function updateSiteConfigSolutions(formData: FormData): Promise<voi
   revalidateSettings();
 }
 
+export async function updateSiteConfigAbout(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const parsed = aboutPageSectionSchema.safeParse({
+    about_page_title: formData.get("about_page_title"),
+    about_page_subtitle: formData.get("about_page_subtitle"),
+    about_page_body_md: formData.get("about_page_body_md"),
+    about_page_seo_title: formData.get("about_page_seo_title"),
+    about_page_seo_description: formData.get("about_page_seo_description"),
+  });
+  if (!parsed.success) throw new Error(parsed.error.message);
+  const { error } = await supabase.from("site_config").update(parsed.data).eq("singleton_key", "main");
+  if (error) {
+    if (/about_page_|schema cache/i.test(error.message)) {
+      throw new Error(
+        "Kolom halaman Tentang belum ada di database Supabase. Buka SQL Editor, jalankan isi file supabase/migrations/007_about_page.sql, tunggu beberapa detik agar schema cache terbarui, lalu simpan lagi."
+      );
+    }
+    throw new Error(error.message);
+  }
+  revalidateSettings();
+}
+
 function parseOptionalAbsoluteUrl(raw: unknown, label: string): string | null {
   const s = String(raw ?? "").trim();
   if (!s) return null;
@@ -246,6 +287,13 @@ export async function resetSiteConfigSection(formData: FormData): Promise<void> 
       patch.nav_logo_url = fb.nav_logo_url;
       patch.favicon_url = fb.favicon_url;
       break;
+    case "about":
+      patch.about_page_title = fb.about_page_title;
+      patch.about_page_subtitle = fb.about_page_subtitle;
+      patch.about_page_body_md = fb.about_page_body_md;
+      patch.about_page_seo_title = fb.about_page_seo_title;
+      patch.about_page_seo_description = fb.about_page_seo_description;
+      break;
     default:
       break;
   }
@@ -291,6 +339,11 @@ export async function createSiteConfigRow(formData?: FormData): Promise<void> {
     industries_json: fb.industries_json,
     nav_logo_url: fb.nav_logo_url,
     favicon_url: fb.favicon_url,
+    about_page_title: fb.about_page_title,
+    about_page_subtitle: fb.about_page_subtitle,
+    about_page_body_md: fb.about_page_body_md,
+    about_page_seo_title: fb.about_page_seo_title,
+    about_page_seo_description: fb.about_page_seo_description,
   });
   if (error) throw new Error(error.message);
   revalidateSettings();

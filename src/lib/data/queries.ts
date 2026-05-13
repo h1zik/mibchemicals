@@ -1,3 +1,4 @@
+import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { parseGalleryImages } from "@/lib/product-gallery";
 import { INDUSTRY_ICON_KEY_SET } from "@/lib/industry-icon-keys";
@@ -181,6 +182,7 @@ export async function getSiteConfig(): Promise<SiteConfig | null> {
   if (error || !data) return null;
 
   const row = data as Record<string, unknown>;
+  const fb = FALLBACK_SITE_CONFIG;
   return {
     ...(data as SiteConfig),
     industries_json: parseIndustries(data.industries_json),
@@ -188,6 +190,22 @@ export async function getSiteConfig(): Promise<SiteConfig | null> {
       row.nav_logo_url == null || row.nav_logo_url === "" ? null : String(row.nav_logo_url),
     favicon_url:
       row.favicon_url == null || row.favicon_url === "" ? null : String(row.favicon_url),
+    about_page_title:
+      typeof row.about_page_title === "string" && row.about_page_title.trim()
+        ? String(row.about_page_title).trim()
+        : fb.about_page_title,
+    about_page_subtitle:
+      typeof row.about_page_subtitle === "string" ? String(row.about_page_subtitle) : fb.about_page_subtitle,
+    about_page_body_md:
+      typeof row.about_page_body_md === "string" ? String(row.about_page_body_md) : fb.about_page_body_md,
+    about_page_seo_title:
+      row.about_page_seo_title == null || row.about_page_seo_title === ""
+        ? null
+        : String(row.about_page_seo_title),
+    about_page_seo_description:
+      row.about_page_seo_description == null || row.about_page_seo_description === ""
+        ? null
+        : String(row.about_page_seo_description),
   };
 }
 

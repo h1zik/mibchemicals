@@ -35,6 +35,13 @@ export type SiteConfig = {
   nav_logo_url: string | null;
   /** URL publik favicon (opsional). */
   favicon_url: string | null;
+  /** Halaman /about — judul & konten (Markdown). */
+  about_page_title: string;
+  about_page_subtitle: string;
+  about_page_body_md: string;
+  /** Meta title/description khusus /about (opsional). */
+  about_page_seo_title: string | null;
+  about_page_seo_description: string | null;
 };
 
 import type { ProductGalleryImage } from "@/lib/product-gallery";
