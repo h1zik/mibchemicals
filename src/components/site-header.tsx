@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { SiteConfig } from "@/types/database";
+import { SiteHeaderMobileMenu } from "@/components/site-header-mobile-menu";
 
 const nav = [
   { href: "/services", label: "Layanan" },
@@ -12,7 +13,7 @@ const nav = [
 export function SiteHeader({ config }: { config: SiteConfig }) {
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex min-w-0 items-center gap-3 leading-tight">
           {config.nav_logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -50,27 +51,21 @@ export function SiteHeader({ config }: { config: SiteConfig }) {
             </Link>
           ))}
         </nav>
-        <Link
-          href="/contact"
-          className="rounded border-2 border-mib bg-mib px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-mib-dark"
-        >
-          {config.hero_primary_cta_label}
-        </Link>
-      </div>
-      <nav
-        aria-label="Mobile"
-        className="flex gap-4 overflow-x-auto border-t border-neutral-100 px-4 py-2 md:hidden"
-      >
-        {nav.map((item) => (
+        <div className="flex shrink-0 items-center gap-2">
           <Link
-            key={item.href}
-            href={item.href}
-            className="whitespace-nowrap text-sm font-medium text-neutral-700"
+            href="/contact"
+            className="hidden rounded border-2 border-mib bg-mib px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-mib-dark md:inline-block"
           >
-            {item.label}
+            {config.hero_primary_cta_label}
           </Link>
-        ))}
-      </nav>
+          <SiteHeaderMobileMenu
+            nav={nav}
+            ctaHref="/contact"
+            ctaLabel={config.hero_primary_cta_label}
+            companyName={config.company_name}
+          />
+        </div>
+      </div>
     </header>
   );
 }
