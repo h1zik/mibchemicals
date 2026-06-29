@@ -45,18 +45,23 @@ export function SiteHeader({ config }: { config: SiteConfig }) {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-neutral-700 transition hover:text-mib"
+              className="group relative text-sm font-medium text-neutral-700 transition-colors duration-200 hover:text-mib"
             >
               {item.label}
+              <span
+                aria-hidden
+                className="absolute -bottom-1.5 left-0 h-0.5 w-full origin-left scale-x-0 rounded-full bg-mib-gradient transition-transform duration-300 group-hover:scale-x-100"
+              />
             </Link>
           ))}
         </nav>
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/contact"
-            className="hidden rounded border-2 border-mib bg-mib px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-mib-dark md:inline-block"
+            className="shine-hover group hidden items-center justify-center gap-1.5 rounded-lg bg-mib-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lg md:inline-flex"
           >
             {config.hero_primary_cta_label}
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </Link>
           <SiteHeaderMobileMenu
             nav={nav}

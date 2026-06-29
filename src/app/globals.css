@@ -4,7 +4,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #1a1a1a;
+  --foreground: #14210c;
 }
 
 body {
@@ -15,5 +15,73 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Brand gradient text */
+  .text-gradient-mib {
+    background-image: linear-gradient(120deg, #6a9a2e 0%, #588425 50%, #8ec63f 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Technical engineering grid */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(88, 132, 37, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(88, 132, 37, 0.07) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .bg-grid-dark {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* Molecular dot field */
+  .bg-dots {
+    background-image: radial-gradient(rgba(88, 132, 37, 0.18) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+  }
+
+  /* Fade a pattern out toward the edges */
+  .mask-fade {
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+  }
+
+  /* Shine sweep on hover (used on primary CTAs) */
+  .shine-hover {
+    position: relative;
+    overflow: hidden;
+  }
+  .shine-hover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.35),
+      transparent
+    );
+    transform: translateX(-120%) skewX(-12deg);
+    pointer-events: none;
+  }
+  .shine-hover:hover::after {
+    animation: shine 1.1s ease-in-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }

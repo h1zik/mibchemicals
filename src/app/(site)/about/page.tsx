@@ -1,4 +1,5 @@
 import { MarkdownBody } from "@/components/markdown-body";
+import { PageHero } from "@/components/page-hero";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
 import { getSiteConfig } from "@/lib/data/queries";
@@ -22,18 +23,23 @@ export default async function AboutPage() {
   const cfg = (await getSiteConfig()) ?? FALLBACK_SITE_CONFIG;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <ScrollReveal>
-        <header className="border-b border-neutral-200 pb-10">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">{cfg.about_page_title}</h1>
-          {cfg.about_page_subtitle.trim() ? (
-            <p className="mt-4 text-lg text-neutral-600">{cfg.about_page_subtitle}</p>
-          ) : null}
-        </header>
-        <div className="pt-10">
-          <MarkdownBody content={cfg.about_page_body_md} />
+    <>
+      <PageHero
+        eyebrow="Profil"
+        title={cfg.about_page_title}
+        subtitle={cfg.about_page_subtitle.trim() ? cfg.about_page_subtitle : undefined}
+      />
+
+      <section className="bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <ScrollReveal from="up">
+            <div className="relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-card sm:p-10">
+              <span aria-hidden className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-mib-gradient" />
+              <MarkdownBody content={cfg.about_page_body_md} />
+            </div>
+          </ScrollReveal>
         </div>
-      </ScrollReveal>
-    </div>
+      </section>
+    </>
   );
 }

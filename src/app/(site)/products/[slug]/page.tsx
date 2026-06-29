@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MarkdownBody } from "@/components/markdown-body";
 import { ProductGallery } from "@/components/product-gallery";
+import { PageHero } from "@/components/page-hero";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { getMsdsPublicUrl, getProductBySlug, getSimilarProducts, getSiteConfig } from "@/lib/data/queries";
 import { SimilarProductsSection } from "@/components/similar-products";
@@ -34,82 +35,87 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <>
-    <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <ScrollReveal>
-        <nav aria-label="Breadcrumb" className="text-sm text-neutral-500">
-          <ol className="flex flex-wrap gap-2">
-            <li>
-              <Link href="/products" className="hover:text-mib">
-                Produk
-              </Link>
-            </li>
-            <li aria-hidden>/</li>
-            <li className="text-foreground">{product.name}</li>
-          </ol>
-        </nav>
-        <header className="mt-6">
-          <p className="text-sm font-semibold uppercase text-mib">
-            {product.product_category?.name ?? "—"}
-          </p>
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-foreground">{product.name}</h1>
-        </header>
-      </ScrollReveal>
+      <PageHero
+        narrow
+        eyebrow={product.product_category?.name ?? "Produk"}
+        title={product.name}
+        top={
+          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-neutral-500">
+            <ol className="flex flex-wrap gap-2">
+              <li>
+                <Link href="/products" className="hover:text-mib">
+                  Produk
+                </Link>
+              </li>
+              <li aria-hidden>/</li>
+              <li className="text-mib-ink">{product.name}</li>
+            </ol>
+          </nav>
+        }
+      />
 
-      {product.gallery_images.length > 0 ? (
-        <ScrollReveal delay={0.06} className="mt-10">
-          <ProductGallery images={product.gallery_images} productName={product.name} />
-        </ScrollReveal>
-      ) : null}
+      <article className="bg-white py-14 sm:py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          {product.gallery_images.length > 0 ? (
+            <ScrollReveal from="up">
+              <ProductGallery images={product.gallery_images} productName={product.name} />
+            </ScrollReveal>
+          ) : null}
 
-      {specs.length > 0 ? (
-        <ScrollReveal delay={0.08} className="mt-10">
-          <section aria-labelledby="specs-heading">
-            <h2 id="specs-heading" className="text-lg font-bold text-foreground">
-              Spesifikasi
-            </h2>
-            <dl className="mt-4 divide-y divide-neutral-200 rounded border border-neutral-200">
-              {specs.map(([k, v]) => (
-                <div key={k} className="grid grid-cols-1 gap-1 px-4 py-3 sm:grid-cols-3">
-                  <dt className="text-sm font-medium text-neutral-500">{k}</dt>
-                  <dd className="text-sm text-foreground sm:col-span-2">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        </ScrollReveal>
-      ) : null}
+          {specs.length > 0 ? (
+            <ScrollReveal delay={0.06} from="up" className={product.gallery_images.length > 0 ? "mt-12" : ""}>
+              <section aria-labelledby="specs-heading">
+                <h2 id="specs-heading" className="font-display text-lg font-bold text-mib-ink">
+                  Spesifikasi
+                </h2>
+                <dl className="mt-4 divide-y divide-neutral-200 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-card">
+                  {specs.map(([k, v]) => (
+                    <div key={k} className="grid grid-cols-1 gap-1 px-5 py-3.5 sm:grid-cols-3 odd:bg-neutral-50/60">
+                      <dt className="text-sm font-semibold text-neutral-500">{k}</dt>
+                      <dd className="text-sm text-mib-ink sm:col-span-2">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            </ScrollReveal>
+          ) : null}
 
-      <ScrollReveal delay={0.1} className="mt-10 border-t border-neutral-200 pt-10">
-        <MarkdownBody content={product.description_md} />
-      </ScrollReveal>
+          <ScrollReveal delay={0.08} from="up" className="mt-12 border-t border-neutral-200 pt-10">
+            <MarkdownBody content={product.description_md} />
+          </ScrollReveal>
 
-      <ScrollReveal delay={0.12} className="mt-10 flex flex-wrap gap-4">
-        {msdsUrl ? (
-          <a
-            href={msdsUrl}
-            className="inline-flex rounded border-2 border-mib px-5 py-2.5 font-semibold text-mib hover:bg-mib/5"
-            target="_blank"
-            rel="noopener noreferrer"
-            download={product.msds_original_filename ?? true}
-          >
-            Unduh MSDS
-            {product.msds_original_filename ? ` (${product.msds_original_filename})` : ""}
-          </a>
-        ) : (
-          <p className="text-sm text-neutral-500">MSDS akan tersedia setelah admin mengunggah file.</p>
-        )}
-        <Link
-          href="/contact"
-          className="inline-flex rounded border-2 border-mib bg-mib px-5 py-2.5 font-semibold text-white hover:bg-mib-dark"
-        >
-          Minta penawaran
-        </Link>
-      </ScrollReveal>
-    </article>
-    <SimilarProductsSection
-      products={similarProducts}
-      categoryName={product.product_category?.name}
-    />
+          <ScrollReveal delay={0.1} from="up" className="mt-10 flex flex-wrap items-center gap-4">
+            <Link
+              href="/contact"
+              className="shine-hover group inline-flex items-center justify-center gap-2 rounded-lg bg-mib-gradient px-6 py-3 font-semibold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lg"
+            >
+              Minta penawaran
+              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </Link>
+            {msdsUrl ? (
+              <a
+                href={msdsUrl}
+                className="inline-flex items-center gap-2 rounded-lg border-2 border-mib/30 bg-white/60 px-6 py-3 font-semibold text-mib-dark backdrop-blur transition-all duration-300 hover:border-mib hover:bg-mib/5"
+                target="_blank"
+                rel="noopener noreferrer"
+                download={product.msds_original_filename ?? true}
+              >
+                <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor" aria-hidden>
+                  <path d="M10 2a1 1 0 0 1 1 1v7.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4l2.3 2.3V3a1 1 0 0 1 1-1Zm-6 13a1 1 0 0 1 1 1h10a1 1 0 1 1 0 2H5a2 2 0 0 1-2-2 1 1 0 0 1 1-1Z" />
+                </svg>
+                Unduh MSDS
+              </a>
+            ) : (
+              <p className="text-sm text-neutral-500">MSDS akan tersedia setelah admin mengunggah file.</p>
+            )}
+          </ScrollReveal>
+        </div>
+      </article>
+
+      <SimilarProductsSection
+        products={similarProducts}
+        categoryName={product.product_category?.name}
+      />
     </>
   );
 }
