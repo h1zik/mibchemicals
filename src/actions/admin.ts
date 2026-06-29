@@ -55,6 +55,7 @@ const siteConfigSectionKey = z.enum([
   "industries",
   "branding",
   "about",
+  "analytics",
 ]);
 
 const seoSectionSchema = z.object({
@@ -209,6 +210,34 @@ export async function updateSiteConfigAbout(formData: FormData): Promise<void> {
   revalidateSettings();
 }
 
+export async function updateSiteConfigAnalytics(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const raw = String(formData.get("ga_measurement_id") ?? "").trim();
+  let ga_measurement_id: string | null = null;
+  if (raw) {
+    if (!/^G-[A-Z0-9]+$/i.test(raw)) {
+      throw new Error(
+        "Measurement ID GA4 harus berformat G-XXXXXXXXXX (mis. G-ABC123DEF4). Kosongkan untuk menonaktifkan Google Analytics."
+      );
+    }
+    ga_measurement_id = raw.toUpperCase();
+  }
+  const { error } = await supabase
+    .from("site_config")
+    .update({ ga_measurement_id })
+    .eq("singleton_key", "main");
+  if (error) {
+    if (/ga_measurement_id|schema cache/i.test(error.message)) {
+      throw new Error(
+        "Kolom ga_measurement_id belum ada di database Supabase. Buka SQL Editor, jalankan isi file supabase/migrations/008_analytics.sql, tunggu beberapa detik agar schema cache terbarui, lalu simpan lagi."
+      );
+    }
+    throw new Error(error.message);
+  }
+  revalidateSettings();
+}
+
 function parseOptionalAbsoluteUrl(raw: unknown, label: string): string | null {
   const s = String(raw ?? "").trim();
   if (!s) return null;
@@ -294,6 +323,9 @@ export async function resetSiteConfigSection(formData: FormData): Promise<void> 
       patch.about_page_seo_title = fb.about_page_seo_title;
       patch.about_page_seo_description = fb.about_page_seo_description;
       break;
+    case "analytics":
+      patch.ga_measurement_id = fb.ga_measurement_id;
+      break;
     default:
       break;
   }
@@ -344,6 +376,7 @@ export async function createSiteConfigRow(formData?: FormData): Promise<void> {
     about_page_body_md: fb.about_page_body_md,
     about_page_seo_title: fb.about_page_seo_title,
     about_page_seo_description: fb.about_page_seo_description,
+    ga_measurement_id: fb.ga_measurement_id,
   });
   if (error) throw new Error(error.message);
   revalidateSettings();

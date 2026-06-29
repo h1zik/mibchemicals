@@ -64,7 +64,16 @@ export const FALLBACK_SITE_CONFIG: SiteConfig = {
     "## Visi kami\n\nMenjadi mitra specialty chemicals dan maklon kimia industri yang andal untuk kebutuhan B2B.\n\n## Yang kami lakukan\n\nKami mendampingi formulasi, skala produksi, dan implementasi di lapangan — dari assessment hingga delivery.",
   about_page_seo_title: null,
   about_page_seo_description: null,
+  ga_measurement_id: null,
 };
 
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+/**
+ * Fallback GA4 Measurement ID dari env (NEXT_PUBLIC_GA_MEASUREMENT_ID).
+ * Sumber utama adalah site config (diatur dari Admin → Pengaturan situs →
+ * Analytics). Env ini hanya dipakai bila field admin kosong.
+ */
+export const gaMeasurementIdEnvFallback =
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || undefined;

@@ -42,6 +42,8 @@ export type SiteConfig = {
   /** Meta title/description khusus /about (opsional). */
   about_page_seo_title: string | null;
   about_page_seo_description: string | null;
+  /** GA4 Measurement ID (mis. "G-XXXXXXXXXX"). Kosong/null = GA tidak dimuat. Diatur dari admin. */
+  ga_measurement_id: string | null;
 };
 
 import type { ProductGalleryImage } from "@/lib/product-gallery";

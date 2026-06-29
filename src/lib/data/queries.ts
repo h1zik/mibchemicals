@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { parseGalleryImages } from "@/lib/product-gallery";
@@ -165,7 +166,7 @@ function parseIndustries(raw: unknown): SiteConfig["industries_json"] {
     .filter(Boolean) as SiteConfig["industries_json"];
 }
 
-export async function getSiteConfig(): Promise<SiteConfig | null> {
+export const getSiteConfig = cache(async (): Promise<SiteConfig | null> => {
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -206,8 +207,12 @@ export async function getSiteConfig(): Promise<SiteConfig | null> {
       row.about_page_seo_description == null || row.about_page_seo_description === ""
         ? null
         : String(row.about_page_seo_description),
+    ga_measurement_id:
+      row.ga_measurement_id == null || String(row.ga_measurement_id).trim() === ""
+        ? null
+        : String(row.ga_measurement_id).trim(),
   };
-}
+});
 
 export async function getServices(): Promise<Service[]> {
   if (
