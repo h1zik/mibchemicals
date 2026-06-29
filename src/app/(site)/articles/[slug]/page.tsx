@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MarkdownBody } from "@/components/markdown-body";
+import { PageHero } from "@/components/page-hero";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { SimilarArticlesSection } from "@/components/similar-articles";
 import { getPostBySlug, getSimilarPosts, getSiteConfig } from "@/lib/data/queries";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -27,52 +29,60 @@ export default async function ArticleDetailPage({ params }: Props) {
   if (!post) notFound();
 
   const similarPosts = await getSimilarPosts(post.category_id, post.id, 3);
+  const category =
+    post.post_category?.name ?? (post.post_type === "case_study" ? "Studi kasus" : "Berita");
 
   return (
     <>
-    <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <nav aria-label="Breadcrumb" className="text-sm text-neutral-500">
-        <ol className="flex flex-wrap gap-2">
-          <li>
-            <Link href="/articles" className="hover:text-mib">
-              Artikel
-            </Link>
-          </li>
-          <li aria-hidden>/</li>
-          <li className="text-foreground">{post.title}</li>
-        </ol>
-      </nav>
-      <header className="mt-6">
-        <p className="text-xs font-semibold uppercase text-mib">
-          {post.post_category?.name ??
-            (post.post_type === "case_study" ? "Studi kasus" : "Berita")}
-        </p>
-        <h1 className="mt-2 text-4xl font-bold tracking-tight text-foreground">{post.title}</h1>
-        <p className="mt-4 text-lg text-neutral-600">{post.excerpt}</p>
-        <p className="mt-4 text-sm text-neutral-500">
+      <PageHero
+        narrow
+        eyebrow={category}
+        title={post.title}
+        subtitle={post.excerpt}
+        top={
+          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-neutral-500">
+            <ol className="flex flex-wrap gap-2">
+              <li>
+                <Link href="/articles" className="hover:text-mib">
+                  Artikel
+                </Link>
+              </li>
+              <li aria-hidden>/</li>
+              <li className="text-mib-ink">{post.title}</li>
+            </ol>
+          </nav>
+        }
+      >
+        <p className="mt-5 text-sm text-neutral-500">
           {post.author_name}
           {post.published_at
-            ? ` · ${new Date(post.published_at).toLocaleDateString("id-ID", {
-                dateStyle: "long",
-              })}`
+            ? ` · ${new Date(post.published_at).toLocaleDateString("id-ID", { dateStyle: "long" })}`
             : ""}
         </p>
-      </header>
-      {post.cover_image_url ? (
-        <div className="relative mx-auto mt-10 aspect-square w-full max-w-lg overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.cover_image_url}
-            alt=""
-            className="h-full w-full object-cover object-center"
-          />
+      </PageHero>
+
+      <article className="bg-white py-14 sm:py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          {post.cover_image_url ? (
+            <ScrollReveal from="up" scale>
+              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 shadow-card">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={post.cover_image_url}
+                  alt=""
+                  className="h-full w-full object-cover object-center"
+                />
+              </div>
+            </ScrollReveal>
+          ) : null}
+
+          <ScrollReveal delay={0.06} from="up" className={post.cover_image_url ? "mt-12" : ""}>
+            <MarkdownBody content={post.body_md} />
+          </ScrollReveal>
         </div>
-      ) : null}
-      <div className="mt-10 border-t border-neutral-200 pt-10">
-        <MarkdownBody content={post.body_md} />
-      </div>
-    </article>
-    <SimilarArticlesSection posts={similarPosts} />
+      </article>
+
+      <SimilarArticlesSection posts={similarPosts} />
     </>
   );
 }

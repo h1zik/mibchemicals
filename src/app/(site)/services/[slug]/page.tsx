@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IndustryIcon } from "@/components/industry-icon";
 import { MarkdownBody } from "@/components/markdown-body";
+import { PageHero } from "@/components/page-hero";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { getServiceBySlug, getSiteConfig } from "@/lib/data/queries";
 import { buildPageMetadata } from "@/lib/metadata";
 
@@ -29,36 +31,48 @@ export default async function ServiceDetailPage({ params }: Props) {
   if (!service) notFound();
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <nav aria-label="Breadcrumb" className="text-sm text-neutral-500">
-        <ol className="flex flex-wrap gap-2">
-          <li>
-            <Link href="/services" className="hover:text-mib">
-              Layanan
+    <>
+      <PageHero
+        narrow
+        title={service.title}
+        subtitle={service.summary}
+        top={
+          <>
+            <nav aria-label="Breadcrumb" className="mb-6 text-sm text-neutral-500">
+              <ol className="flex flex-wrap gap-2">
+                <li>
+                  <Link href="/services" className="hover:text-mib">
+                    Layanan
+                  </Link>
+                </li>
+                <li aria-hidden>/</li>
+                <li className="text-mib-ink">{service.title}</li>
+              </ol>
+            </nav>
+            <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-mib/10 text-mib shadow-glow">
+              <IndustryIcon industryKey={service.icon_key} className="text-current" />
+            </div>
+          </>
+        }
+      />
+
+      <article className="bg-white py-14 sm:py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <ScrollReveal from="up">
+            <MarkdownBody content={service.body_md} />
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.08} from="up" className="mt-12">
+            <Link
+              href="/contact"
+              className="shine-hover group inline-flex items-center justify-center gap-2 rounded-lg bg-mib-gradient px-6 py-3 font-semibold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-lg"
+            >
+              Diskusikan kebutuhan Anda
+              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </Link>
-          </li>
-          <li aria-hidden>/</li>
-          <li className="text-foreground">{service.title}</li>
-        </ol>
-      </nav>
-      <header className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start">
-        <IndustryIcon industryKey={service.icon_key} className="h-12 w-12 shrink-0" />
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">{service.title}</h1>
-          <p className="mt-4 text-lg text-neutral-600">{service.summary}</p>
+          </ScrollReveal>
         </div>
-      </header>
-      <div className="mt-10 border-t border-neutral-200 pt-10">
-        <MarkdownBody content={service.body_md} />
-      </div>
-      <p className="mt-12">
-        <Link
-          href="/contact"
-          className="inline-flex rounded border-2 border-mib bg-mib px-5 py-2.5 font-semibold text-white hover:bg-mib-dark"
-        >
-          Diskusikan kebutuhan Anda
-        </Link>
-      </p>
-    </article>
+      </article>
+    </>
   );
 }

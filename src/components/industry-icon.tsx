@@ -1,7 +1,10 @@
 type Props = { industryKey: string; className?: string };
 
 export function IndustryIcon({ industryKey, className }: Props) {
-  const cn = "h-10 w-10 text-mib " + (className ?? "");
+  const extra = className ?? "";
+  // Hanya pakai warna default jika pemanggil tidak menentukan warna teks sendiri.
+  const color = /(^|\s)(text-|!text-)/.test(extra) ? "" : "text-mib ";
+  const cn = `h-10 w-10 ${color}${extra}`;
   switch (industryKey) {
     case "oil-gas":
       return (
