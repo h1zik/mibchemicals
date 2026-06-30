@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
-import { FALLBACK_SITE_CONFIG, siteUrl } from "@/lib/constants";
+import { FALLBACK_SITE_CONFIG, gaMeasurementIdEnvFallback, siteUrl } from "@/lib/constants";
 import { getSiteConfig } from "@/lib/data/queries";
 
 const inter = Inter({
@@ -47,14 +48,19 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // GA4 Measurement ID: utama dari site config (admin panel), fallback ke env.
+  const cfg = await getSiteConfig();
+  const gaId = cfg?.ga_measurement_id?.trim() || gaMeasurementIdEnvFallback;
+
   return (
     <html lang="id" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen font-sans antialiased">{children}</body>
+      {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
     </html>
   );
 }

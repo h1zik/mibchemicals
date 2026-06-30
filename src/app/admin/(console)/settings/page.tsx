@@ -1,6 +1,7 @@
 import {
   createSiteConfigRow,
   updateSiteConfigAbout,
+  updateSiteConfigAnalytics,
   updateSiteConfigBranding,
   updateSiteConfigCompany,
   updateSiteConfigHero,
@@ -81,6 +82,34 @@ export default async function AdminSettingsPage() {
             </div>
           </AdminSaveForm>
           <AdminSettingsFormFooter formId="settings-seo" section="seo" />
+        </AdminSettingsSection>
+
+        <AdminSettingsSection
+          title="Analytics (Google Analytics)"
+          description="Pasang Google Analytics 4 tanpa menyentuh kode. Isi Measurement ID untuk mengaktifkan pelacakan kunjungan; kosongkan untuk menonaktifkan."
+        >
+          <AdminSaveForm
+            id="settings-analytics"
+            action={updateSiteConfigAnalytics}
+            className="space-y-4"
+            successMessage="Pengaturan Analytics disimpan. GA aktif di seluruh halaman publik."
+          >
+            <div>
+              <label className={adminLabel}>Google Analytics 4 — Measurement ID</label>
+              <input
+                name="ga_measurement_id"
+                defaultValue={cfg.ga_measurement_id ?? ""}
+                placeholder="G-XXXXXXXXXX"
+                className={`${adminInput} font-mono`}
+              />
+              <p className="mt-1.5 text-xs leading-relaxed text-neutral-500">
+                Ambil dari Google Analytics → Admin → Data streams → pilih stream Web → <em>Measurement ID</em>.
+                Berformat <code className="rounded bg-neutral-100 px-1 font-mono">G-XXXXXXXXXX</code>. Kosongkan
+                untuk menonaktifkan Google Analytics di situs.
+              </p>
+            </div>
+          </AdminSaveForm>
+          <AdminSettingsFormFooter formId="settings-analytics" section="analytics" />
         </AdminSettingsSection>
 
         <AdminSettingsSection
