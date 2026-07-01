@@ -13,7 +13,10 @@ import { buildPageMetadata } from "@/lib/metadata";
 export async function generateMetadata() {
   const config = (await getSiteConfig()) ?? FALLBACK_SITE_CONFIG;
   return buildPageMetadata(await getSiteConfig(), {
-    title: config.company_name,
+    // Homepage memakai judul SEO branded penuh dari admin (meta_title_default),
+    // tanpa append nama perusahaan lagi supaya tidak dobel.
+    title: config.meta_title_default,
+    appendCompany: false,
     description: config.meta_description_default,
     path: "/",
     keywords: ["specialty chemicals", "maklon kimia industri", "MIB Chemicals"],
