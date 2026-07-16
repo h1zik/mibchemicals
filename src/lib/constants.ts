@@ -65,6 +65,9 @@ export const FALLBACK_SITE_CONFIG: SiteConfig = {
   about_page_seo_title: null,
   about_page_seo_description: null,
   ga_measurement_id: null,
+  company_stats_json: [],
+  certifications_json: [],
+  about_gallery_json: [],
 };
 
 export const siteUrl =

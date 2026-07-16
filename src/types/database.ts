@@ -44,6 +44,81 @@ export type SiteConfig = {
   about_page_seo_description: string | null;
   /** GA4 Measurement ID (mis. "G-XXXXXXXXXX"). Kosong/null = GA tidak dimuat. Diatur dari admin. */
   ga_measurement_id: string | null;
+  /** Statistik perusahaan untuk blok kredibilitas. Kosong = section disembunyikan. */
+  company_stats_json: CompanyStat[];
+  /** Sertifikasi/akreditasi. Kosong = section disembunyikan. */
+  certifications_json: Certification[];
+  /** Galeri foto fasilitas di halaman /about. */
+  about_gallery_json: AboutGalleryImage[];
+};
+
+export type CompanyStat = {
+  value: number;
+  suffix: string;
+  label: string;
+};
+
+export type Certification = {
+  name: string;
+  description: string;
+  image_url?: string;
+};
+
+export type AboutGalleryImage = {
+  url: string;
+  alt?: string;
+};
+
+export type Industry = {
+  id: string;
+  slug: string;
+  name: string;
+  summary: string;
+  intro_md: string;
+  icon_key: string;
+  hero_image_url: string | null;
+  process_image_url: string | null;
+  sort_order: number;
+  published: boolean;
+  seo_title: string | null;
+  seo_description: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Solution = {
+  id: string;
+  slug: string;
+  title: string;
+  industry_id: string | null;
+  /** Dari join Supabase `industries`; kosong jika relasi tidak di-select. */
+  industry: Pick<Industry, "id" | "name" | "slug"> | null;
+  equipment: string | null;
+  problem: string;
+  solution_label: string;
+  summary: string;
+  body_md: string;
+  image_url: string | null;
+  sort_order: number;
+  published: boolean;
+  seo_title: string | null;
+  seo_description: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Testimonial = {
+  id: string;
+  author_name: string;
+  author_role: string | null;
+  quote: string;
+  avatar_url: string | null;
+  industry_id: string | null;
+  rating: number | null;
+  sort_order: number;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 import type { ProductGalleryImage } from "@/lib/product-gallery";

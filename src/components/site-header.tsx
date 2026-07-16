@@ -3,8 +3,9 @@ import type { SiteConfig } from "@/types/database";
 import { SiteHeaderMobileMenu } from "@/components/site-header-mobile-menu";
 
 const nav = [
+  { href: "/industries", label: "Industri" },
+  { href: "/solutions", label: "Solusi" },
   { href: "/services", label: "Layanan" },
-  { href: "/products", label: "Produk" },
   { href: "/articles", label: "Artikel" },
   { href: "/about", label: "Tentang kami" },
   { href: "/contact", label: "Kontak" },

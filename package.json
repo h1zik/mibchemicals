@@ -30,7 +30,11 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
+    "heic-convert": "^2.1.0",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.22.0",
     "postcss": "^8",
+    "sharp": "^0.35.3",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

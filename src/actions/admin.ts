@@ -29,6 +29,8 @@ function revalidatePublic() {
   revalidatePath("/", "layout");
   revalidatePath("/services");
   revalidatePath("/products");
+  revalidatePath("/industries");
+  revalidatePath("/solutions");
   revalidatePath("/articles");
   revalidatePath("/contact");
   revalidatePath("/about");
@@ -56,6 +58,8 @@ const siteConfigSectionKey = z.enum([
   "branding",
   "about",
   "analytics",
+  "credibility",
+  "about_gallery",
 ]);
 
 const seoSectionSchema = z.object({
@@ -272,6 +276,85 @@ export async function updateSiteConfigIndustries(formData: FormData): Promise<vo
   revalidateSettings();
 }
 
+const companyStatSchema = z.object({
+  value: z.coerce.number(),
+  suffix: z.string(),
+  label: z.string().min(1),
+});
+
+const certificationSchema = z.object({
+  name: z.string().min(1),
+  description: z.string(),
+  image_url: z.string().url().optional().or(z.literal("")),
+});
+
+const aboutGalleryImageSchema = z.object({
+  url: z.string().url(),
+  alt: z.string().optional(),
+});
+
+export async function updateSiteConfigCredibility(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+
+  let statsRaw: unknown;
+  let certsRaw: unknown;
+  try {
+    statsRaw = JSON.parse(String(formData.get("company_stats_json") ?? "[]"));
+    certsRaw = JSON.parse(String(formData.get("certifications_json") ?? "[]"));
+  } catch {
+    throw new Error("Data statistik/sertifikasi bukan JSON valid");
+  }
+  const company_stats_json = z.array(companyStatSchema).parse(statsRaw);
+  const certifications_json = z
+    .array(certificationSchema)
+    .parse(certsRaw)
+    .map((c) => ({
+      name: c.name,
+      description: c.description,
+      ...(c.image_url ? { image_url: c.image_url } : {}),
+    }));
+
+  const { error } = await supabase
+    .from("site_config")
+    .update({ company_stats_json, certifications_json })
+    .eq("singleton_key", "main");
+  if (error) {
+    if (/company_stats_json|certifications_json|schema cache/i.test(error.message)) {
+      throw new Error(
+        "Kolom kredibilitas belum ada di database. Jalankan supabase/migrations/012_credibility.sql, tunggu beberapa detik, lalu simpan lagi."
+      );
+    }
+    throw new Error(error.message);
+  }
+  revalidateSettings();
+}
+
+export async function updateSiteConfigAboutGallery(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  let raw: unknown;
+  try {
+    raw = JSON.parse(String(formData.get("about_gallery_json") ?? "[]"));
+  } catch {
+    throw new Error("Galeri bukan JSON valid");
+  }
+  const about_gallery_json = z.array(aboutGalleryImageSchema).parse(raw);
+  const { error } = await supabase
+    .from("site_config")
+    .update({ about_gallery_json })
+    .eq("singleton_key", "main");
+  if (error) {
+    if (/about_gallery_json|schema cache/i.test(error.message)) {
+      throw new Error(
+        "Kolom galeri about belum ada di database. Jalankan supabase/migrations/012_credibility.sql, lalu simpan lagi."
+      );
+    }
+    throw new Error(error.message);
+  }
+  revalidateSettings();
+}
+
 /** Menyalin nilai template ke satu bagian site_config (efek “hapus kustomisasi bagian ini”). */
 export async function resetSiteConfigSection(formData: FormData): Promise<void> {
   const supabase = await requireAdmin();
@@ -326,6 +409,13 @@ export async function resetSiteConfigSection(formData: FormData): Promise<void> 
     case "analytics":
       patch.ga_measurement_id = fb.ga_measurement_id;
       break;
+    case "credibility":
+      patch.company_stats_json = fb.company_stats_json;
+      patch.certifications_json = fb.certifications_json;
+      break;
+    case "about_gallery":
+      patch.about_gallery_json = fb.about_gallery_json;
+      break;
     default:
       break;
   }
@@ -377,6 +467,9 @@ export async function createSiteConfigRow(formData?: FormData): Promise<void> {
     about_page_seo_title: fb.about_page_seo_title,
     about_page_seo_description: fb.about_page_seo_description,
     ga_measurement_id: fb.ga_measurement_id,
+    company_stats_json: fb.company_stats_json,
+    certifications_json: fb.certifications_json,
+    about_gallery_json: fb.about_gallery_json,
   });
   if (error) throw new Error(error.message);
   revalidateSettings();
@@ -828,4 +921,262 @@ export async function uploadProductMsds(formData: FormData): Promise<void> {
   revalidatePath("/products");
   revalidatePath("/admin/products");
   redirect(`/admin/products/${productId}/edit`);
+}
+
+// ---------------------------------------------------------------------------
+// Industri
+// ---------------------------------------------------------------------------
+
+const industrySchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  summary: z.string(),
+  intro_md: z.string(),
+  icon_key: z.string().min(1),
+  hero_image_url: z.string().optional(),
+  process_image_url: z.string().optional(),
+  sort_order: z.coerce.number().int(),
+  published: z.coerce.boolean(),
+  seo_title: z.string().optional(),
+  seo_description: z.string().optional(),
+});
+
+export async function upsertIndustry(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = formData.get("id") as string | null;
+  const name = String(formData.get("name") ?? "");
+  let slug = String(formData.get("slug") ?? "");
+  if (!slug) slug = slugify(name);
+  const parsed = industrySchema.safeParse({
+    id: id || undefined,
+    slug,
+    name,
+    summary: String(formData.get("summary") ?? ""),
+    intro_md: String(formData.get("intro_md") ?? ""),
+    icon_key: String(formData.get("icon_key") ?? "flask"),
+    hero_image_url: formData.get("hero_image_url") || undefined,
+    process_image_url: formData.get("process_image_url") || undefined,
+    sort_order: formData.get("sort_order") ?? 0,
+    published: formData.get("published") === "on" || formData.get("published") === "true",
+    seo_title: formData.get("seo_title") || undefined,
+    seo_description: formData.get("seo_description") || undefined,
+  });
+  if (!parsed.success) throw new Error(parsed.error.message);
+
+  const row = {
+    slug: parsed.data.slug,
+    name: parsed.data.name,
+    summary: parsed.data.summary,
+    intro_md: parsed.data.intro_md,
+    icon_key: parsed.data.icon_key,
+    hero_image_url: parsed.data.hero_image_url || null,
+    process_image_url: parsed.data.process_image_url || null,
+    sort_order: parsed.data.sort_order,
+    published: parsed.data.published,
+    seo_title: parsed.data.seo_title ?? null,
+    seo_description: parsed.data.seo_description ?? null,
+  };
+
+  if (parsed.data.id) {
+    const { error } = await supabase.from("industries").update(row).eq("id", parsed.data.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { data: inserted, error } = await supabase
+      .from("industries")
+      .insert(row)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    if (!inserted?.id) throw new Error("Gagal membuat industri");
+    revalidatePublic();
+    revalidatePath("/admin/industries");
+    redirect(`/admin/industries/${inserted.id}/edit`);
+  }
+  revalidatePublic();
+  revalidatePath("/admin/industries");
+}
+
+export async function deleteIndustryForm(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = String(formData.get("id") ?? "");
+  if (!z.string().uuid().safeParse(id).success) throw new Error("ID tidak valid");
+  const { error } = await supabase.from("industries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePublic();
+  revalidatePath("/admin/industries");
+  redirect("/admin/industries");
+}
+
+// ---------------------------------------------------------------------------
+// Solusi
+// ---------------------------------------------------------------------------
+
+const solutionSchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().min(1),
+  title: z.string().min(1),
+  industry_id: z.string().uuid().optional(),
+  equipment: z.string().optional(),
+  problem: z.string(),
+  solution_label: z.string(),
+  summary: z.string(),
+  body_md: z.string(),
+  image_url: z.string().optional(),
+  sort_order: z.coerce.number().int(),
+  published: z.coerce.boolean(),
+  seo_title: z.string().optional(),
+  seo_description: z.string().optional(),
+});
+
+export async function upsertSolution(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = formData.get("id") as string | null;
+  const title = String(formData.get("title") ?? "");
+  let slug = String(formData.get("slug") ?? "");
+  if (!slug) slug = slugify(title);
+  const industryRaw = String(formData.get("industry_id") ?? "").trim();
+  const parsed = solutionSchema.safeParse({
+    id: id || undefined,
+    slug,
+    title,
+    industry_id: industryRaw || undefined,
+    equipment: formData.get("equipment") || undefined,
+    problem: String(formData.get("problem") ?? ""),
+    solution_label: String(formData.get("solution_label") ?? ""),
+    summary: String(formData.get("summary") ?? ""),
+    body_md: String(formData.get("body_md") ?? ""),
+    image_url: formData.get("image_url") || undefined,
+    sort_order: formData.get("sort_order") ?? 0,
+    published: formData.get("published") === "on" || formData.get("published") === "true",
+    seo_title: formData.get("seo_title") || undefined,
+    seo_description: formData.get("seo_description") || undefined,
+  });
+  if (!parsed.success) throw new Error(parsed.error.message);
+
+  const row = {
+    slug: parsed.data.slug,
+    title: parsed.data.title,
+    industry_id: parsed.data.industry_id ?? null,
+    equipment: parsed.data.equipment || null,
+    problem: parsed.data.problem,
+    solution_label: parsed.data.solution_label,
+    summary: parsed.data.summary,
+    body_md: parsed.data.body_md,
+    image_url: parsed.data.image_url || null,
+    sort_order: parsed.data.sort_order,
+    published: parsed.data.published,
+    seo_title: parsed.data.seo_title ?? null,
+    seo_description: parsed.data.seo_description ?? null,
+  };
+
+  if (parsed.data.id) {
+    const { error } = await supabase.from("solutions").update(row).eq("id", parsed.data.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { data: inserted, error } = await supabase
+      .from("solutions")
+      .insert(row)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    if (!inserted?.id) throw new Error("Gagal membuat solusi");
+    revalidatePublic();
+    revalidatePath("/admin/solutions");
+    redirect(`/admin/solutions/${inserted.id}/edit`);
+  }
+  revalidatePublic();
+  revalidatePath("/admin/solutions");
+}
+
+export async function deleteSolutionForm(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = String(formData.get("id") ?? "");
+  if (!z.string().uuid().safeParse(id).success) throw new Error("ID tidak valid");
+  const { error } = await supabase.from("solutions").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePublic();
+  revalidatePath("/admin/solutions");
+  redirect("/admin/solutions");
+}
+
+// ---------------------------------------------------------------------------
+// Testimonial
+// ---------------------------------------------------------------------------
+
+const testimonialSchema = z.object({
+  id: z.string().uuid().optional(),
+  author_name: z.string().min(1),
+  author_role: z.string().optional(),
+  quote: z.string().min(1),
+  avatar_url: z.string().optional(),
+  industry_id: z.string().uuid().optional(),
+  rating: z.coerce.number().int().min(1).max(5).optional(),
+  sort_order: z.coerce.number().int(),
+  published: z.coerce.boolean(),
+});
+
+export async function upsertTestimonial(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = formData.get("id") as string | null;
+  const industryRaw = String(formData.get("industry_id") ?? "").trim();
+  const ratingRaw = String(formData.get("rating") ?? "").trim();
+  const parsed = testimonialSchema.safeParse({
+    id: id || undefined,
+    author_name: String(formData.get("author_name") ?? ""),
+    author_role: formData.get("author_role") || undefined,
+    quote: String(formData.get("quote") ?? ""),
+    avatar_url: formData.get("avatar_url") || undefined,
+    industry_id: industryRaw || undefined,
+    rating: ratingRaw || undefined,
+    sort_order: formData.get("sort_order") ?? 0,
+    published: formData.get("published") === "on" || formData.get("published") === "true",
+  });
+  if (!parsed.success) throw new Error(parsed.error.message);
+
+  const row = {
+    author_name: parsed.data.author_name,
+    author_role: parsed.data.author_role || null,
+    quote: parsed.data.quote,
+    avatar_url: parsed.data.avatar_url || null,
+    industry_id: parsed.data.industry_id ?? null,
+    rating: parsed.data.rating ?? null,
+    sort_order: parsed.data.sort_order,
+    published: parsed.data.published,
+  };
+
+  if (parsed.data.id) {
+    const { error } = await supabase.from("testimonials").update(row).eq("id", parsed.data.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { data: inserted, error } = await supabase
+      .from("testimonials")
+      .insert(row)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    if (!inserted?.id) throw new Error("Gagal membuat testimoni");
+    revalidatePublic();
+    revalidatePath("/admin/testimonials");
+    redirect(`/admin/testimonials/${inserted.id}/edit`);
+  }
+  revalidatePublic();
+  revalidatePath("/admin/testimonials");
+}
+
+export async function deleteTestimonialForm(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  if (!supabase) throw new Error("Unauthorized");
+  const id = String(formData.get("id") ?? "");
+  if (!z.string().uuid().safeParse(id).success) throw new Error("ID tidak valid");
+  const { error } = await supabase.from("testimonials").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePublic();
+  revalidatePath("/admin/testimonials");
+  redirect("/admin/testimonials");
 }

@@ -2,9 +2,11 @@ import Link from "next/link";
 import type { SiteConfig } from "@/types/database";
 
 const navLinks = [
+  { href: "/industries", label: "Industri" },
+  { href: "/solutions", label: "Solusi" },
   { href: "/services", label: "Layanan" },
-  { href: "/products", label: "Produk" },
   { href: "/articles", label: "Artikel & insight" },
+  { href: "/products", label: "Produk" },
   { href: "/about", label: "Tentang kami" },
   { href: "/contact", label: "Kontak" },
 ];
