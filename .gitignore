@@ -29,6 +29,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# raw source assets (foto mentah klien) & dokumen sumber — jangan commit (besar)
+/assets/
+*.pdf
+
 # vercel
 .vercel
 

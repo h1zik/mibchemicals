@@ -14,10 +14,12 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { AdminSettingsFormFooter } from "@/components/admin/admin-settings-form-footer";
 import { AdminSettingsSection } from "@/components/admin/admin-settings-section";
-import { IndustriesSectionEditor } from "@/components/admin/industries-section-editor";
+import { CredibilitySectionEditor } from "@/components/admin/credibility-section-editor";
+import { AboutGalleryEditor } from "@/components/admin/about-gallery-editor";
+import Link from "next/link";
 import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
 import { getSiteConfig } from "@/lib/data/queries";
-import { adminControl, adminInput, adminLabel, adminPrimaryBtn } from "@/lib/admin-ui";
+import { adminControl, adminInput, adminLabel, adminPrimaryBtn, adminMutedLink } from "@/lib/admin-ui";
 
 export default async function AdminSettingsPage() {
   const dbConfig = await getSiteConfig();
@@ -333,10 +335,34 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
-          title="Industri"
-          description="Daftar sektor untuk halaman industri & ikon. CRUD baris di bawah; simpan mengirim JSON ke server."
+          title="Kredibilitas (statistik & sertifikasi)"
+          description="Angka statistik perusahaan dan sertifikasi yang tampil di blok kredibilitas beranda & halaman Tentang. Kosongkan bila belum ada data resmi."
         >
-          <IndustriesSectionEditor initial={cfg.industries_json} />
+          <CredibilitySectionEditor
+            initialStats={cfg.company_stats_json}
+            initialCerts={cfg.certifications_json}
+          />
+        </AdminSettingsSection>
+
+        <AdminSettingsSection
+          title="Galeri foto (Tentang kami)"
+          description="Foto fasilitas/tim yang tampil sebagai galeri di halaman /about."
+        >
+          <AboutGalleryEditor initial={cfg.about_gallery_json} />
+        </AdminSettingsSection>
+
+        <AdminSettingsSection
+          title="Industri"
+          description="Sektor industri kini dikelola sebagai konten tersendiri dengan halaman & tabel Masalah–Solusi."
+        >
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-5">
+            <p className="text-sm text-neutral-700">
+              Kelola daftar industri, foto, dan konten di menu khusus.
+            </p>
+            <Link href="/admin/industries" className={`${adminMutedLink} mt-2 inline-block`}>
+              Buka pengelolaan Industri →
+            </Link>
+          </div>
         </AdminSettingsSection>
       </div>
       ) : null}

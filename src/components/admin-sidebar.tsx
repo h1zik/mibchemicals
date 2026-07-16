@@ -4,6 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Factory,
+  Lightbulb,
+  MessageSquareQuote,
   Briefcase,
   Package,
   Tags,
@@ -16,7 +19,10 @@ import {
 
 const links = [
   { href: "/admin", label: "Ringkasan", icon: LayoutDashboard },
+  { href: "/admin/industries", label: "Industri", icon: Factory },
+  { href: "/admin/solutions", label: "Solusi", icon: Lightbulb },
   { href: "/admin/services", label: "Layanan", icon: Briefcase },
+  { href: "/admin/testimonials", label: "Testimoni", icon: MessageSquareQuote },
   { href: "/admin/products", label: "Produk", icon: Package },
   { href: "/admin/product-categories", label: "Kategori produk", icon: Tags },
   { href: "/admin/posts", label: "Artikel", icon: Newspaper },
