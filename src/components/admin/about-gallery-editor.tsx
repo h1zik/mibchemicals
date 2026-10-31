@@ -41,7 +41,7 @@ export function AboutGalleryEditor({ initial }: Props) {
 
   return (
     <div className="space-y-5">
-      <p className="text-sm leading-relaxed text-neutral-600">
+      <p className="text-sm leading-relaxed text-admin-muted">
         Foto fasilitas/tim yang tampil sebagai galeri di halaman Tentang. Unggah foto lalu simpan bagian ini.
       </p>
 
@@ -54,7 +54,7 @@ export function AboutGalleryEditor({ initial }: Props) {
               id="about-gallery-file"
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
-              className="mt-1 block w-full text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15"
+              className="mt-1 block w-full text-sm text-admin-muted file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15"
               disabled={pending}
             />
           </div>
@@ -80,7 +80,7 @@ export function AboutGalleryEditor({ initial }: Props) {
       {items.length > 0 ? (
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {items.map((item, i) => (
-            <li key={`${i}-${item.url}`} className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3 shadow-sm">
+            <li key={`${i}-${item.url}`} className="rounded-xl border border-admin-line bg-admin-canvas/60 p-3 shadow-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={item.url} alt="" className="aspect-square w-full rounded-lg object-cover" />
               <input
@@ -100,7 +100,7 @@ export function AboutGalleryEditor({ initial }: Props) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-neutral-500">Belum ada foto galeri.</p>
+        <p className="text-sm text-admin-muted">Belum ada foto galeri.</p>
       )}
 
       <AdminSaveForm id="settings-about-gallery" action={updateSiteConfigAboutGallery} successMessage="Galeri disimpan.">

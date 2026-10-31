@@ -20,6 +20,17 @@ const config: Config = {
           deep: "#16240c",
           ink: "#0c1207",
         },
+        /** Admin console neutrals — green-tinted mineral greys. */
+        admin: {
+          canvas: "#f2f4ee",
+          line: "#dce1d3",
+          soft: "#eceee6",
+          ink: "#1f2a17",
+          muted: "#5e6857",
+          draft: "#a16207",
+          "draft-bg": "#fef6e0",
+          danger: "#b42318",
+        },
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
@@ -60,6 +71,18 @@ const config: Config = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        "toast-in": {
+          "0%": { transform: "translateY(8px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "drawer-in": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         float: "float 7s ease-in-out infinite",
@@ -68,6 +91,9 @@ const config: Config = {
         "gradient-pan": "gradient-pan 6s ease-in-out infinite",
         "pulse-ring": "pulse-ring 2.4s cubic-bezier(0.4,0,0.6,1) infinite",
         marquee: "marquee 28s linear infinite",
+        "toast-in": "toast-in 220ms cubic-bezier(0.2,0.8,0.2,1)",
+        "drawer-in": "drawer-in 240ms cubic-bezier(0.2,0.8,0.2,1)",
+        "fade-in": "fade-in 200ms ease-out",
       },
     },
   },

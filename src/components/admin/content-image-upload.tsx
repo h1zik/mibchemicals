@@ -15,7 +15,7 @@ type Props = {
 };
 
 const fileInputClass =
-  "mt-1 block w-full max-w-md text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15";
+  "mt-1 block w-full max-w-md text-sm text-admin-muted file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15";
 
 function isNextRedirectError(e: unknown): boolean {
   return (
@@ -80,25 +80,25 @@ export function ContentImageUpload({ entity, field, id, currentUrl, label, hint 
             <img
               src={currentUrl}
               alt=""
-              className="h-28 w-28 rounded-lg border border-neutral-200 object-cover shadow-sm sm:h-32 sm:w-32"
+              className="h-28 w-28 rounded-lg border border-admin-line object-cover shadow-sm sm:h-32 sm:w-32"
             />
           ) : (
-            <div className="flex h-28 w-28 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 text-center sm:h-32 sm:w-32">
+            <div className="flex h-28 w-28 flex-col items-center justify-center rounded-lg border border-admin-line bg-admin-canvas text-center sm:h-32 sm:w-32">
               <ImageUp className="h-8 w-8 text-neutral-400" aria-hidden />
-              <span className="mt-1 px-2 text-[10px] font-medium uppercase tracking-wide text-neutral-400">
+              <span className="mt-1 px-2 text-[11px] font-medium text-admin-muted">
                 Belum ada
               </span>
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="inline-flex items-center gap-2 text-sm font-bold text-neutral-900">
+          <p className="inline-flex items-center gap-2 text-sm font-bold text-admin-ink">
             <ImageUp className="h-4 w-4 text-mib" aria-hidden />
             {label}
           </p>
-          <p className="mt-1 text-xs leading-relaxed text-neutral-600">
+          <p className="mt-1 text-xs leading-relaxed text-admin-muted">
             {hint ?? "JPG, PNG, WebP, atau GIF — maks. 6 MB."} Disimpan di bucket{" "}
-            <code className="rounded bg-neutral-100 px-1 font-mono text-[11px] text-mib">content-media</code>.
+            <code className="rounded bg-admin-soft px-1 font-mono text-[11px] text-mib">content-media</code>.
           </p>
           {error ? (
             <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">

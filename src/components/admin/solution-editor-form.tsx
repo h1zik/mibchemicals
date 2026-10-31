@@ -1,18 +1,12 @@
-import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
+import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormActions } from "@/components/admin/admin-form-actions";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { ContentImageUpload } from "@/components/admin/content-image-upload";
 import { deleteSolutionForm, upsertSolution } from "@/actions/admin";
-import {
-  adminDangerZoneButton,
-  adminGhostLink,
-  adminInput,
-  adminLabel,
-  adminMutedLink,
-  adminPrimaryBtn,
-} from "@/lib/admin-ui";
+import { adminInput, adminLabel } from "@/lib/admin-ui";
 import type { Industry, Solution } from "@/types/database";
 
 type Props = {
@@ -27,31 +21,18 @@ export function SolutionEditorForm({ solution, industries }: Props) {
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <Link href="/admin/solutions" className={`${adminMutedLink} inline-flex items-center gap-1.5`}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar solusi
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-          {isEdit ? "Edit solusi" : "Solusi baru"}
-        </h1>
-        {isEdit && s && publicPath ? (
-          <Link
-            href={publicPath}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-neutral-500 transition hover:text-mib"
-          >
-            Pratinjau publik
-            <ExternalLink className="h-3 w-3" aria-hidden />
-          </Link>
-        ) : (
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
-            Solusi (problem → solution) tampil di /solutions dan sebagai baris tabel di halaman industri terkait.
-            Simpan dulu untuk mengunggah foto.
-          </p>
-        )}
-      </div>
+      <AdminEditorHeader
+        backHref="/admin/solutions"
+        backLabel="Daftar solusi"
+        title={isEdit ? "Edit solusi" : "Solusi baru"}
+        published={s?.published}
+        publicPath={s?.published ? publicPath : null}
+        description={
+          isEdit
+            ? undefined
+            : "Solusi (problem → solution) tampil di /solutions dan sebagai baris tabel di halaman industri terkait. Simpan dulu untuk mengunggah foto."
+        }
+      />
 
       <AdminSaveForm action={upsertSolution} className="space-y-8" successMessage="Solusi berhasil disimpan.">
         {isEdit && s ? <input type="hidden" name="id" value={s.id} /> : null}
@@ -81,7 +62,7 @@ export function SolutionEditorForm({ solution, industries }: Props) {
             <label htmlFor="sol-summary" className={adminLabel}>Ringkasan</label>
             <textarea id="sol-summary" name="summary" rows={2} defaultValue={s?.summary} className={adminInput} placeholder="Tampil di kartu solusi." />
           </div>
-          <div className="!mt-6 border-t border-neutral-100 pt-6">
+          <div className="!mt-6 border-t border-admin-line pt-6">
             <AdminMarkdownEditor
               label="Isi halaman solusi (Markdown)"
               name="body_md"
@@ -130,11 +111,11 @@ export function SolutionEditorForm({ solution, industries }: Props) {
             <label htmlFor="sol-sort" className={adminLabel}>Urutan</label>
             <input id="sol-sort" name="sort_order" type="number" defaultValue={s?.sort_order ?? 0} className={adminInput} />
           </div>
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-admin-line bg-admin-canvas/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
             <input type="checkbox" name="published" defaultChecked={s?.published ?? true} className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-mib focus:ring-mib focus:ring-offset-0" />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-neutral-900">Published</span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-600">Tampilkan solusi di situs publik.</span>
+              <span className="block text-sm font-semibold text-admin-ink">Published</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">Tampilkan solusi di situs publik.</span>
             </span>
           </label>
         </AdminFormSection>
@@ -150,24 +131,13 @@ export function SolutionEditorForm({ solution, industries }: Props) {
           </div>
         </AdminFormSection>
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/admin/solutions" className={`${adminGhostLink} py-2 sm:py-0`}>Batal</Link>
-          <button type="submit" className={`${adminPrimaryBtn} w-full justify-center sm:w-auto`}>
-            {isEdit ? "Simpan perubahan" : "Simpan & lanjut unggah foto"}
-          </button>
-        </div>
+        <AdminFormActions
+          cancelHref="/admin/solutions"
+          submitLabel={isEdit ? "Simpan perubahan" : "Simpan & lanjut unggah foto"}
+        />
       </AdminSaveForm>
 
-      {isEdit && s ? (
-        <aside className="mt-8 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">
-          <h2 className="text-sm font-bold text-red-900">Zona bahaya</h2>
-          <p className="mt-1 text-sm text-red-800/90">Menghapus solusi tidak dapat dibatalkan.</p>
-          <form action={deleteSolutionForm} className="mt-4">
-            <input type="hidden" name="id" value={s.id} />
-            <button type="submit" className={adminDangerZoneButton}>Hapus solusi</button>
-          </form>
-        </aside>
-      ) : null}
+      {isEdit && s ? <AdminDangerZone action={deleteSolutionForm} id={s.id} noun="solusi" /> : null}
     </div>
   );
 }
