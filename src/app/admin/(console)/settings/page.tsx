@@ -13,6 +13,7 @@ import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { AdminSettingsFormFooter } from "@/components/admin/admin-settings-form-footer";
+import { AdminSettingsNav } from "@/components/admin/admin-settings-nav";
 import { AdminSettingsSection } from "@/components/admin/admin-settings-section";
 import { CredibilitySectionEditor } from "@/components/admin/credibility-section-editor";
 import { AboutGalleryEditor } from "@/components/admin/about-gallery-editor";
@@ -21,20 +22,63 @@ import { FALLBACK_SITE_CONFIG } from "@/lib/constants";
 import { getSiteConfig } from "@/lib/data/queries";
 import { adminControl, adminInput, adminLabel, adminPrimaryBtn, adminMutedLink } from "@/lib/admin-ui";
 
+const SECTIONS = [
+  {
+    id: "seo",
+    label: "SEO"
+  },
+  {
+    id: "analytics",
+    label: "Analytics"
+  },
+  {
+    id: "perusahaan",
+    label: "Perusahaan & kontak"
+  },
+  {
+    id: "tentang",
+    label: "Tentang kami"
+  },
+  {
+    id: "branding",
+    label: "Logo & favicon"
+  },
+  {
+    id: "hero",
+    label: "Hero beranda"
+  },
+  {
+    id: "solusi-beranda",
+    label: "Blok solusi beranda"
+  },
+  {
+    id: "kredibilitas",
+    label: "Kredibilitas"
+  },
+  {
+    id: "galeri",
+    label: "Galeri foto"
+  },
+  {
+    id: "industri",
+    label: "Industri"
+  }
+];
+
 export default async function AdminSettingsPage() {
   const dbConfig = await getSiteConfig();
   const cfg = dbConfig ?? FALLBACK_SITE_CONFIG;
   const hasDbRow = Boolean(dbConfig);
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <AdminPageHeader
         title="Pengaturan situs"
-        description="Setiap bagian punya simpan sendiri (update) dan reset ke template (hapus kustomisasi bagian itu). Industri: tambah/hapus baris lalu simpan."
+        description="Setiap bagian disimpan sendiri-sendiri. Reset ke default mengembalikan bagian itu ke nilai template."
       />
 
       {!hasDbRow ? (
-        <div className="mb-10 rounded-2xl border border-amber-200/90 bg-amber-50 p-5 shadow-sm">
+        <div className="mb-10 max-w-3xl rounded-xl border border-amber-200/90 bg-amber-50 p-5">
           <p className="text-sm font-semibold text-amber-950">Belum ada baris konfigurasi di database</p>
           <p className="mt-2 text-sm leading-relaxed text-amber-900/90">
             Tabel <code className="rounded bg-amber-100/80 px-1 font-mono text-xs">site_config</code> belum berisi
@@ -54,8 +98,11 @@ export default async function AdminSettingsPage() {
       ) : null}
 
       {hasDbRow ? (
-      <div className="space-y-10">
+      <div className="lg:grid lg:grid-cols-[11rem_minmax(0,48rem)] lg:gap-10">
+        <AdminSettingsNav items={SECTIONS} />
+      <div className="space-y-12">
         <AdminSettingsSection
+          id="seo"
           title="SEO"
           description="Nilai default meta untuk halaman yang tidak menimpa title/description sendiri."
         >
@@ -87,6 +134,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="analytics"
           title="Analytics (Google Analytics)"
           description="Pasang Google Analytics 4 tanpa menyentuh kode. Isi Measurement ID untuk mengaktifkan pelacakan kunjungan; kosongkan untuk menonaktifkan."
         >
@@ -104,9 +152,9 @@ export default async function AdminSettingsPage() {
                 placeholder="G-XXXXXXXXXX"
                 className={`${adminInput} font-mono`}
               />
-              <p className="mt-1.5 text-xs leading-relaxed text-neutral-500">
+              <p className="mt-1.5 text-xs leading-relaxed text-admin-muted">
                 Ambil dari Google Analytics → Admin → Data streams → pilih stream Web → <em>Measurement ID</em>.
-                Berformat <code className="rounded bg-neutral-100 px-1 font-mono">G-XXXXXXXXXX</code>. Kosongkan
+                Berformat <code className="rounded bg-admin-soft px-1 font-mono">G-XXXXXXXXXX</code>. Kosongkan
                 untuk menonaktifkan Google Analytics di situs.
               </p>
             </div>
@@ -115,6 +163,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="perusahaan"
           title="Perusahaan & kontak"
           description="Identitas perusahaan dan kontak yang ditampilkan di footer, kontak, dan blok teks terkait."
         >
@@ -156,6 +205,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="tentang"
           title="Halaman Tentang kami"
           description="Konten untuk rute /about — judul, subjudul, isi Markdown, dan meta SEO opsional."
         >
@@ -210,6 +260,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="branding"
           title="Logo & favicon"
           description="Logo di navbar dan ikon tab browser. Bisa isi URL manual atau unggah ke bucket site-assets."
         >
@@ -228,7 +279,7 @@ export default async function AdminSettingsPage() {
                 placeholder="https://…/logo.png"
                 className={`${adminInput} font-mono text-sm`}
               />
-              <p className="mt-1.5 text-xs text-neutral-500">Kosongkan untuk hanya menampilkan nama perusahaan sebagai teks.</p>
+              <p className="mt-1.5 text-xs text-admin-muted">Kosongkan untuk hanya menampilkan nama perusahaan sebagai teks.</p>
             </div>
             <div>
               <label className={adminLabel}>URL favicon</label>
@@ -239,7 +290,7 @@ export default async function AdminSettingsPage() {
                 placeholder="https://…/favicon.ico"
                 className={`${adminInput} font-mono text-sm`}
               />
-              <p className="mt-1.5 text-xs text-neutral-500">Harus URL absolut (https). Setelah simpan, hard refresh jika ikon tab tidak berubah.</p>
+              <p className="mt-1.5 text-xs text-admin-muted">Harus URL absolut (https). Setelah simpan, hard refresh jika ikon tab tidak berubah.</p>
             </div>
           </AdminSaveForm>
           <AdminBrandingUploads />
@@ -247,6 +298,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="hero"
           title="Hero"
           description="Judul besar beranda, subjudul, dan tombol ajakan utama / sekunder."
         >
@@ -299,6 +351,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="solusi-beranda"
           title="Solusi (Problem → Inovasi → MIB)"
           description="Tiga blok narasi beranda. Judul singkat dan paragraf isi untuk masing-masing blok."
         >
@@ -325,7 +378,7 @@ export default async function AdminSettingsPage() {
                 ["solution_mib_title", "solution_mib_body", cfg.solution_mib_title, cfg.solution_mib_body],
               ] as const
             ).map(([tk, bk, tv, bv]) => (
-              <div key={tk} className="grid gap-2 border-t border-neutral-100 pt-4 first:border-t-0 first:pt-0">
+              <div key={tk} className="grid gap-2 border-t border-admin-line pt-4 first:border-t-0 first:pt-0">
                 <input name={tk} defaultValue={tv} className={`${adminControl} font-semibold`} />
                 <textarea name={bk} rows={3} defaultValue={bv} className={adminControl} />
               </div>
@@ -335,6 +388,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="kredibilitas"
           title="Kredibilitas (statistik & sertifikasi)"
           description="Angka statistik perusahaan dan sertifikasi yang tampil di blok kredibilitas beranda & halaman Tentang. Kosongkan bila belum ada data resmi."
         >
@@ -345,6 +399,7 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="galeri"
           title="Galeri foto (Tentang kami)"
           description="Foto fasilitas/tim yang tampil sebagai galeri di halaman /about."
         >
@@ -352,18 +407,20 @@ export default async function AdminSettingsPage() {
         </AdminSettingsSection>
 
         <AdminSettingsSection
+          id="industri"
           title="Industri"
           description="Sektor industri kini dikelola sebagai konten tersendiri dengan halaman & tabel Masalah–Solusi."
         >
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-5">
-            <p className="text-sm text-neutral-700">
+          <div className="rounded-xl border border-admin-line bg-admin-canvas/60 p-5">
+            <p className="text-sm text-admin-ink">
               Kelola daftar industri, foto, dan konten di menu khusus.
             </p>
             <Link href="/admin/industries" className={`${adminMutedLink} mt-2 inline-block`}>
-              Buka pengelolaan Industri →
+              Buka pengelolaan industri
             </Link>
           </div>
         </AdminSettingsSection>
+      </div>
       </div>
       ) : null}
     </div>

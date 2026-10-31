@@ -1,17 +1,14 @@
-import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormActions } from "@/components/admin/admin-form-actions";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { ContentImageUpload } from "@/components/admin/content-image-upload";
 import { deleteIndustryForm, upsertIndustry } from "@/actions/admin";
 import {
-  adminDangerZoneButton,
-  adminGhostLink,
   adminInput,
   adminLabel,
-  adminMutedLink,
-  adminPrimaryBtn,
 } from "@/lib/admin-ui";
 import type { Industry } from "@/types/database";
 
@@ -36,31 +33,14 @@ export function IndustryEditorForm({ industry }: Props) {
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <Link href="/admin/industries" className={`${adminMutedLink} inline-flex items-center gap-1.5`}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar industri
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-          {isEdit ? "Edit industri" : "Industri baru"}
-        </h1>
-        {isEdit && s && publicPath ? (
-          <Link
-            href={publicPath}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-neutral-500 transition hover:text-mib"
-          >
-            Pratinjau publik
-            <ExternalLink className="h-3 w-3" aria-hidden />
-          </Link>
-        ) : (
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
-            Halaman /industries/[slug] menampilkan foto, konteks masalah, dan tabel Masalah–Solusi dari solusi yang
-            bertaut ke industri ini. Simpan dulu untuk mengunggah foto.
-          </p>
-        )}
-      </div>
+      <AdminEditorHeader
+        backHref="/admin/industries"
+        backLabel="Daftar industri"
+        title={isEdit ? "Edit industri" : "Industri baru"}
+        published={s?.published}
+        publicPath={s?.published ? publicPath : null}
+        description={isEdit ? undefined : "Halaman /industries/[slug] menampilkan foto, konteks masalah, dan tabel Masalah–Solusi dari solusi yang bertaut ke industri ini. Simpan dulu untuk mengunggah foto."}
+      />
 
       <AdminSaveForm action={upsertIndustry} className="space-y-8" successMessage="Industri berhasil disimpan.">
         {isEdit && s ? <input type="hidden" name="id" value={s.id} /> : null}
@@ -83,13 +63,13 @@ export function IndustryEditorForm({ industry }: Props) {
               className={`${adminInput} font-mono text-sm`}
               placeholder="baja"
             />
-            <p className="mt-1.5 text-xs text-neutral-500">Kosongkan untuk dibuat otomatis dari nama.</p>
+            <p className="mt-1.5 text-xs text-admin-muted">Kosongkan untuk dibuat otomatis dari nama.</p>
           </div>
           <div>
             <label htmlFor="ind-summary" className={adminLabel}>Ringkasan</label>
             <textarea id="ind-summary" name="summary" rows={2} defaultValue={s?.summary} className={adminInput} placeholder="Tampil di kartu industri." />
           </div>
-          <div className="!mt-6 border-t border-neutral-100 pt-6">
+          <div className="!mt-6 border-t border-admin-line pt-6">
             <AdminMarkdownEditor
               label="Konteks masalah industri (Markdown)"
               name="intro_md"
@@ -139,11 +119,11 @@ export function IndustryEditorForm({ industry }: Props) {
         </AdminFormSection>
 
         <AdminFormSection title="Publikasi" description="Industri draft tidak tampil di situs publik.">
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-admin-line bg-admin-canvas/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
             <input type="checkbox" name="published" defaultChecked={s?.published ?? true} className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-mib focus:ring-mib focus:ring-offset-0" />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-neutral-900">Published</span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-600">Tampilkan halaman industri di situs publik.</span>
+              <span className="block text-sm font-semibold text-admin-ink">Published</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">Tampilkan halaman industri di situs publik.</span>
             </span>
           </label>
         </AdminFormSection>
@@ -159,26 +139,10 @@ export function IndustryEditorForm({ industry }: Props) {
           </div>
         </AdminFormSection>
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/admin/industries" className={`${adminGhostLink} py-2 sm:py-0`}>Batal</Link>
-          <button type="submit" className={`${adminPrimaryBtn} w-full justify-center sm:w-auto`}>
-            {isEdit ? "Simpan perubahan" : "Simpan & lanjut unggah foto"}
-          </button>
-        </div>
+        <AdminFormActions cancelHref="/admin/industries" submitLabel={isEdit ? "Simpan perubahan" : "Simpan & lanjut unggah foto"} />
       </AdminSaveForm>
 
-      {isEdit && s ? (
-        <aside className="mt-8 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">
-          <h2 className="text-sm font-bold text-red-900">Zona bahaya</h2>
-          <p className="mt-1 text-sm text-red-800/90">
-            Menghapus industri tidak dapat dibatalkan. Solusi yang bertaut akan kehilangan relasi industri.
-          </p>
-          <form action={deleteIndustryForm} className="mt-4">
-            <input type="hidden" name="id" value={s.id} />
-            <button type="submit" className={adminDangerZoneButton}>Hapus industri</button>
-          </form>
-        </aside>
-      ) : null}
+      {isEdit && s ? <AdminDangerZone action={deleteIndustryForm} id={s.id} noun="industri" note="Menghapus industri tidak dapat dibatalkan. Solusi yang bertaut akan kehilangan relasi industri." /> : null}
     </div>
   );
 }

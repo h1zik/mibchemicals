@@ -1,16 +1,13 @@
-import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormActions } from "@/components/admin/admin-form-actions";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { deleteServiceForm, upsertService } from "@/actions/admin";
 import {
-  adminDangerZoneButton,
-  adminGhostLink,
   adminInput,
   adminLabel,
-  adminMutedLink,
-  adminPrimaryBtn,
 } from "@/lib/admin-ui";
 import type { Service } from "@/types/database";
 
@@ -40,34 +37,14 @@ export function ServiceEditorForm({ service }: Props) {
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <Link href="/admin/services" className={`${adminMutedLink} inline-flex items-center gap-1.5`}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar layanan
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-          {isEdit ? "Edit layanan" : "Layanan baru"}
-        </h1>
-        {isEdit && s ? (
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            {publicPath ? (
-              <Link
-                href={publicPath}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-medium text-neutral-500 transition hover:text-mib"
-              >
-                Pratinjau publik
-                <ExternalLink className="h-3 w-3" aria-hidden />
-              </Link>
-            ) : null}
-          </div>
-        ) : (
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
-            Halaman layanan di situs memakai ikon, ringkasan, dan isi Markdown. Slug opsional saat baru.
-          </p>
-        )}
-      </div>
+      <AdminEditorHeader
+        backHref="/admin/services"
+        backLabel="Daftar layanan"
+        title={isEdit ? "Edit layanan" : "Layanan baru"}
+        published={s?.published}
+        publicPath={s?.published ? publicPath : null}
+        description={isEdit ? undefined : "Halaman layanan di situs memakai ikon, ringkasan, dan isi Markdown. Slug opsional saat baru."}
+      />
 
       <AdminSaveForm action={upsertService} className="space-y-8" successMessage="Layanan berhasil disimpan.">
         {isEdit && s ? <input type="hidden" name="id" value={s.id} /> : null}
@@ -101,7 +78,7 @@ export function ServiceEditorForm({ service }: Props) {
               className={`${adminInput} font-mono text-sm`}
               placeholder="treatment-air"
             />
-            <p className="mt-1.5 text-xs text-neutral-500">
+            <p className="mt-1.5 text-xs text-admin-muted">
               Huruf kecil, angka, tanda hubung. Kosongkan untuk dibuat otomatis dari judul.
             </p>
           </div>
@@ -118,7 +95,7 @@ export function ServiceEditorForm({ service }: Props) {
               placeholder="Tampil di kartu & daftar layanan."
             />
           </div>
-          <div className="!mt-6 border-t border-neutral-100 pt-6">
+          <div className="!mt-6 border-t border-admin-line pt-6">
             <AdminMarkdownEditor
               label="Isi halaman (Markdown)"
               defaultValue={s?.body_md ?? ""}
@@ -164,7 +141,7 @@ export function ServiceEditorForm({ service }: Props) {
           title="Publikasi"
           description="Layanan draft tidak tampil di navigasi publik hingga dicentang published."
         >
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-admin-line bg-admin-canvas/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
             <input
               type="checkbox"
               name="published"
@@ -172,8 +149,8 @@ export function ServiceEditorForm({ service }: Props) {
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-mib focus:ring-mib focus:ring-offset-0"
             />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-neutral-900">Published</span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-600">
+              <span className="block text-sm font-semibold text-admin-ink">Published</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">
                 Tampilkan halaman layanan di situs publik.
               </span>
             </span>
@@ -210,30 +187,10 @@ export function ServiceEditorForm({ service }: Props) {
           </div>
         </AdminFormSection>
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/admin/services" className={`${adminGhostLink} py-2 sm:py-0`}>
-            Batal
-          </Link>
-          <button type="submit" className={`${adminPrimaryBtn} w-full justify-center sm:w-auto`}>
-            {isEdit ? "Simpan perubahan" : "Simpan layanan"}
-          </button>
-        </div>
+        <AdminFormActions cancelHref="/admin/services" submitLabel={isEdit ? "Simpan perubahan" : "Simpan layanan"} />
       </AdminSaveForm>
 
-      {isEdit && s ? (
-        <aside className="mt-8 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">
-          <h2 className="text-sm font-bold text-red-900">Zona bahaya</h2>
-          <p className="mt-1 text-sm text-red-800/90">
-            Menghapus layanan tidak dapat dibatalkan. Tautan /services/{s.slug} akan hilang.
-          </p>
-          <form action={deleteServiceForm} className="mt-4">
-            <input type="hidden" name="id" value={s.id} />
-            <button type="submit" className={adminDangerZoneButton}>
-              Hapus layanan
-            </button>
-          </form>
-        </aside>
-      ) : null}
+      {isEdit && s ? <AdminDangerZone action={deleteServiceForm} id={s.id} noun="layanan" /> : null}
     </div>
   );
 }

@@ -26,9 +26,10 @@ export function AdminSaveForm({
   id,
   className,
 }: AdminSaveFormProps) {
-  const { showToast } = useAdminFeedback();
+  const { showToast, setFormPending } = useAdminFeedback();
 
   async function wrappedAction(formData: FormData) {
+    if (id) setFormPending(id, true);
     try {
       await action(formData);
       showToast({ variant: "success", message: successMessage });
@@ -36,6 +37,8 @@ export function AdminSaveForm({
       if (isNextRedirectError(e)) throw e;
       const message = e instanceof Error ? e.message : "Terjadi kesalahan. Silakan coba lagi.";
       showToast({ variant: "error", message });
+    } finally {
+      if (id) setFormPending(id, false);
     }
   }
 

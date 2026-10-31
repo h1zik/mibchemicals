@@ -38,16 +38,16 @@ export function IndustriesSectionEditor({ initial }: Props) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-neutral-600">
+      <p className="text-sm text-admin-muted">
         Tambah, ubah, atau hapus sektor. <strong>Key</strong> dipakai sebagai identitas (huruf kecil, tanda hubung).{" "}
         <strong>Simbol</strong> menentukan gambar ikon di kartu beranda — pilih yang paling mewakili sektor.
       </p>
 
       <ul className="space-y-4">
         {items.map((row, i) => (
-          <li key={`${i}-${row.key}`} className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 shadow-sm">
+          <li key={`${i}-${row.key}`} className="rounded-xl border border-admin-line bg-admin-canvas/60 p-4 shadow-sm">
             <div className="mb-3 flex items-center justify-between gap-2">
-              <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">#{i + 1}</span>
+              <span className="font-display text-sm font-semibold text-admin-ink">#{i + 1}</span>
               <button
                 type="button"
                 className={adminDangerLink}
@@ -92,7 +92,7 @@ export function IndustriesSectionEditor({ initial }: Props) {
                   </select>
                   <IndustryIcon industryKey={effectiveIconKeyForEditor(row)} className="h-9 w-9 shrink-0" />
                 </div>
-                <p className="mt-1.5 text-xs text-neutral-500">
+                <p className="mt-1.5 text-xs text-admin-muted">
                   Tampil di blok &quot;Sektor yang dilayani&quot; di beranda. Key boleh unik; simbol pilih dari daftar.
                 </p>
               </div>
@@ -118,7 +118,7 @@ export function IndustriesSectionEditor({ initial }: Props) {
         + Tambah industri
       </button>
 
-      <div className="flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-t border-admin-line pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <AdminSaveForm
           action={updateSiteConfigIndustries}
           className="w-full sm:w-auto"

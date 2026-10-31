@@ -13,7 +13,7 @@ const MDEditor = dynamic(() => import("@uiw/react-md-editor"), {
   ssr: false,
   loading: () => (
     <div
-      className="flex h-[min(480px,70vh)] min-h-[280px] flex-col items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-gradient-to-b from-neutral-50 to-neutral-100/80 text-sm text-neutral-500"
+      className="flex h-[min(480px,70vh)] min-h-[280px] flex-col items-center justify-center gap-2 rounded-xl border border-admin-line bg-gradient-to-b from-neutral-50 to-neutral-100/80 text-sm text-admin-muted"
       role="status"
       aria-live="polite"
     >
@@ -172,7 +172,7 @@ export function AdminMarkdownEditor({
       <p className={adminLabel}>{label}</p>
 
       <div
-        className="rounded-xl border border-neutral-200 bg-gradient-to-br from-white to-neutral-50/80 p-4 shadow-sm ring-1 ring-neutral-900/[0.04] sm:p-5"
+        className="rounded-xl border border-admin-line bg-gradient-to-br from-white to-neutral-50/80 p-4 shadow-sm ring-1 ring-neutral-900/[0.04] sm:p-5"
         onDragOver={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -184,7 +184,7 @@ export function AdminMarkdownEditor({
             <ImagePlus className="h-3.5 w-3.5" aria-hidden />
             Gambar di isi artikel
           </span>
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-admin-muted">
             Seret file ke sini atau unggah — tautan Markdown disisipkan otomatis di posisi kursor.
           </span>
         </div>
@@ -218,19 +218,19 @@ export function AdminMarkdownEditor({
           </button>
 
           <details className="w-full sm:ml-auto sm:w-auto sm:min-w-[220px]">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-neutral-600 underline-offset-2 hover:text-mib hover:underline [&::-webkit-details-marker]:hidden">
+            <summary className="cursor-pointer list-none text-sm font-semibold text-admin-muted underline-offset-2 hover:text-mib hover:underline [&::-webkit-details-marker]:hidden">
               <span className="inline-flex items-center gap-1.5">
                 <Link2 className="h-3.5 w-3.5" aria-hidden />
                 Punya URL gambar? (opsional)
               </span>
             </summary>
-            <div className="mt-3 flex flex-col gap-2 rounded-lg border border-neutral-200 bg-white p-3 sm:flex-row sm:items-center">
+            <div className="mt-3 flex flex-col gap-2 rounded-lg border border-admin-line bg-white p-3 sm:flex-row sm:items-center">
               <input
                 type="url"
                 value={urlDraft}
                 onChange={(e) => setUrlDraft(e.target.value)}
                 placeholder="https://…"
-                className="min-w-0 flex-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-900 shadow-sm outline-none focus:border-mib focus:ring-2 focus:ring-mib/15"
+                className="min-w-0 flex-1 rounded-lg border border-admin-line px-3 py-2 text-sm text-admin-ink shadow-sm outline-none focus:border-mib focus:ring-2 focus:ring-mib/15"
                 disabled={pending}
               />
               <button
@@ -255,7 +255,7 @@ export function AdminMarkdownEditor({
       <input type="hidden" name={name} value={value} />
       <div
         ref={editorWrapRef}
-        className="w-full max-w-none rounded-xl border border-neutral-200 bg-white shadow-sm ring-1 ring-neutral-900/[0.04] transition focus-within:border-mib/40 focus-within:ring-2 focus-within:ring-mib/15 [&_.w-md-editor]:overflow-hidden [&_.w-md-editor]:!rounded-xl [&_.w-md-editor]:!border-0 [&_.w-md-editor]:!shadow-none [&_.w-md-editor-toolbar]:!border-b [&_.w-md-editor-toolbar]:!border-neutral-200 [&_.w-md-editor-toolbar]:!bg-neutral-50/90 [&_.w-md-editor-content]:!min-h-[280px]"
+        className="w-full max-w-none rounded-xl border border-admin-line bg-white shadow-sm ring-1 ring-neutral-900/[0.04] transition focus-within:border-mib/40 focus-within:ring-2 focus-within:ring-mib/15 [&_.w-md-editor]:overflow-hidden [&_.w-md-editor]:!rounded-xl [&_.w-md-editor]:!border-0 [&_.w-md-editor]:!shadow-none [&_.w-md-editor-toolbar]:!border-b [&_.w-md-editor-toolbar]:!border-admin-line [&_.w-md-editor-toolbar]:!bg-admin-canvas/90 [&_.w-md-editor-content]:!min-h-[280px]"
         role="group"
         aria-label={label}
       >
@@ -268,7 +268,7 @@ export function AdminMarkdownEditor({
           commandsFilter={filterToolbarCommands}
         />
       </div>
-      <p className="text-xs leading-relaxed text-neutral-500">{helpText ?? defaultHelp}</p>
+      <p className="text-xs leading-relaxed text-admin-muted">{helpText ?? defaultHelp}</p>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { uploadSiteBrandingAsset } from "@/actions/admin-branding-upload";
 import { adminLabel, adminPrimaryBtn } from "@/lib/admin-ui";
 
 const fileInputClass =
-  "mt-1 block w-full max-w-md text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15";
+  "mt-1 block w-full max-w-md text-sm text-admin-muted file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15";
 
 function isNextRedirectError(e: unknown): boolean {
   return (
@@ -53,9 +53,9 @@ function UploadRow({
   }
 
   return (
-    <div className="rounded-lg border border-neutral-100 bg-white/80 p-4">
+    <div className="rounded-lg border border-admin-line bg-white/80 p-4">
       <p className={adminLabel}>{label}</p>
-      <p className="mt-1 text-xs text-neutral-500">{help}</p>
+      <p className="mt-1 text-xs text-admin-muted">{help}</p>
       {error ? (
         <p className="mt-2 text-sm text-red-700" role="alert">
           {error}

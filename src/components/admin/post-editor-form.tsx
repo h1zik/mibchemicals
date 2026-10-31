@@ -1,17 +1,15 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminPostCoverUpload } from "@/components/admin-post-cover-upload";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormActions } from "@/components/admin/admin-form-actions";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { deletePostForm, upsertPost } from "@/actions/admin";
 import {
-  adminDangerZoneButton,
-  adminGhostLink,
   adminInput,
   adminLabel,
-  adminMutedLink,
-  adminPrimaryBtn,
 } from "@/lib/admin-ui";
 import type { Post, PostCategory } from "@/types/database";
 
@@ -46,54 +44,27 @@ export function PostEditorForm({ post, categories }: Props) {
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <div>
-          <Link
-            href="/admin/posts"
-            className={`${adminMutedLink} inline-flex items-center gap-1.5`}
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            Kembali ke daftar artikel
-          </Link>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-            {isEdit ? "Edit artikel" : "Artikel baru"}
-          </h1>
-          {isEdit && p ? (
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className="inline-flex rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-semibold text-violet-800 ring-1 ring-inset ring-violet-600/15">
-                {p.post_type === "case_study" ? "Studi kasus" : "Berita"}
-              </span>
-              {publicPath ? (
-                <Link
-                  href={publicPath}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-neutral-500 transition hover:text-mib"
-                >
-                  Pratinjau publik
-                  <ExternalLink className="h-3 w-3" aria-hidden />
-                </Link>
-              ) : null}
-            </div>
-          ) : (
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
-              Isi judul dan isi artikel; slug bisa dikosongkan lalu disesuaikan sebelum tayang.
-            </p>
-          )}
+      <AdminEditorHeader
+        backHref="/admin/posts"
+        backLabel="Daftar artikel"
+        title={isEdit ? "Edit artikel" : "Artikel baru"}
+        published={p?.published}
+        publicPath={p?.published ? publicPath : null}
+        description={isEdit ? undefined : "Isi judul dan isi artikel; slug bisa dikosongkan lalu disesuaikan sebelum tayang."}
+      />
+
+      {categories.length === 0 ? (
+        <div className="-mt-2 mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <p className="font-semibold">Belum ada kategori artikel</p>
+          <p className="mt-1 text-amber-900/90">
+            Buat minimal satu kategori di{" "}
+            <Link href="/admin/post-categories" className="font-semibold underline hover:no-underline">
+              Kategori artikel
+            </Link>{" "}
+            sebelum menyimpan.
+          </p>
         </div>
-        {categories.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
-            <p className="font-semibold">Belum ada kategori artikel</p>
-            <p className="mt-1 text-amber-900/90">
-              Buat minimal satu kategori di{" "}
-              <Link href="/admin/post-categories" className="font-semibold underline hover:no-underline">
-                Kategori artikel
-              </Link>{" "}
-              sebelum menyimpan.
-            </p>
-          </div>
-        ) : null}
-      </div>
+      ) : null}
 
       <AdminSaveForm action={upsertPost} className="space-y-8" successMessage="Artikel berhasil disimpan.">
         {isEdit && p ? <input type="hidden" name="id" value={p.id} /> : null}
@@ -127,7 +98,7 @@ export function PostEditorForm({ post, categories }: Props) {
               placeholder="contoh-artikel-tanpa-spasi"
               className={`${adminInput} font-mono text-sm`}
             />
-            <p className="mt-1.5 text-xs text-neutral-500">
+            <p className="mt-1.5 text-xs text-admin-muted">
               Huruf kecil, angka, dan tanda hubung. Ubah slug hanya jika perlu; tautan lama bisa putus.
             </p>
           </div>
@@ -144,7 +115,7 @@ export function PostEditorForm({ post, categories }: Props) {
               className={adminInput}
             />
           </div>
-          <div className="!mt-6 border-t border-neutral-100 pt-6">
+          <div className="!mt-6 border-t border-admin-line pt-6">
             <AdminMarkdownEditor
               postId={p?.id ?? null}
               label="Isi artikel"
@@ -154,9 +125,9 @@ export function PostEditorForm({ post, categories }: Props) {
               helpText="Pratinjau live di samping teks. Gambar di dalam artikel: unggah dari komputer (disarankan) atau sisipkan URL lewat opsi lipatan."
             />
           </div>
-          <div className="rounded-2xl border border-neutral-200/90 bg-gradient-to-b from-neutral-50/80 to-white p-5 shadow-sm sm:p-6">
-            <p className="text-sm font-bold text-neutral-900">Gambar sampul</p>
-            <p className="mt-1 text-sm leading-relaxed text-neutral-600">
+          <div className="rounded-xl border border-admin-line/90 bg-gradient-to-b from-neutral-50/80 to-white p-5 shadow-sm sm:p-6">
+            <p className="text-sm font-bold text-admin-ink">Gambar sampul</p>
+            <p className="mt-1 text-sm leading-relaxed text-admin-muted">
               Tampil di daftar artikel dan kartu di beranda. Unggah file — tidak perlu mencari URL.
             </p>
             {isEdit && p ? (
@@ -164,16 +135,16 @@ export function PostEditorForm({ post, categories }: Props) {
                 <AdminPostCoverUpload postId={p.id} currentUrl={p.cover_image_url} />
               </div>
             ) : (
-              <p className="mt-4 rounded-xl border border-dashed border-mib/25 bg-mib/[0.04] px-4 py-3 text-sm text-neutral-700">
+              <p className="mt-4 rounded-xl border border-dashed border-mib/25 bg-mib/[0.04] px-4 py-3 text-sm text-admin-ink">
                 <span className="font-semibold text-mib">Langkah mudah:</span> simpan artikel dulu, lalu di halaman edit ini Anda bisa{" "}
                 <span className="font-semibold">unggah sampul</span> seperti gambar di isi artikel.
               </p>
             )}
-            <details className="mt-5 rounded-xl border border-neutral-200 bg-white px-4 py-3">
-              <summary className="cursor-pointer text-sm font-semibold text-neutral-700 hover:text-mib">
+            <details className="mt-5 rounded-xl border border-admin-line bg-white px-4 py-3">
+              <summary className="cursor-pointer text-sm font-semibold text-admin-ink hover:text-mib">
                 Lanjutan: set URL sampul manual
               </summary>
-              <p className="mt-2 text-xs text-neutral-500">
+              <p className="mt-2 text-xs text-admin-muted">
                 Hanya jika gambar sudah di-host di luar (CDN, dll.). Kosongkan bila memakai unggah.
               </p>
               <div className="mt-3">
@@ -220,7 +191,7 @@ export function PostEditorForm({ post, categories }: Props) {
                 ))
               )}
             </select>
-            <p className="mt-1.5 text-xs text-neutral-500">
+            <p className="mt-1.5 text-xs text-admin-muted">
               Kelola daftar di{" "}
               <Link href="/admin/post-categories" className="font-semibold text-mib hover:underline">
                 Kategori artikel
@@ -249,10 +220,10 @@ export function PostEditorForm({ post, categories }: Props) {
                 defaultValue={defaultPublishedAt}
                 className={adminInput}
               />
-              <p className="mt-1.5 text-xs text-neutral-500">Digunakan untuk urutan dan tampilan tanggal di artikel.</p>
+              <p className="mt-1.5 text-xs text-admin-muted">Digunakan untuk urutan dan tampilan tanggal di artikel.</p>
             </div>
           </div>
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-admin-line bg-admin-canvas/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
             <input
               type="checkbox"
               name="published"
@@ -260,8 +231,8 @@ export function PostEditorForm({ post, categories }: Props) {
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-mib focus:ring-mib focus:ring-offset-0"
             />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-neutral-900">Published</span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-600">
+              <span className="block text-sm font-semibold text-admin-ink">Published</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">
                 Jika tidak dicentang, artikel disimpan sebagai draf dan tidak tampil di situs publik.
               </span>
             </span>
@@ -310,30 +281,10 @@ export function PostEditorForm({ post, categories }: Props) {
           </div>
         </AdminFormSection>
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/admin/posts" className={`${adminGhostLink} py-2 sm:py-0`}>
-            Batal
-          </Link>
-          <button type="submit" className={`${adminPrimaryBtn} w-full justify-center sm:w-auto`}>
-            {isEdit ? "Simpan perubahan" : "Simpan artikel"}
-          </button>
-        </div>
+        <AdminFormActions cancelHref="/admin/posts" submitLabel={isEdit ? "Simpan perubahan" : "Simpan artikel"} />
       </AdminSaveForm>
 
-      {isEdit && p ? (
-        <aside className="mt-8 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">
-          <h2 className="text-sm font-bold text-red-900">Zona bahaya</h2>
-          <p className="mt-1 text-sm text-red-800/90">
-            Menghapus artikel tidak dapat dibatalkan. Pastikan tidak ada tautan eksternal ke halaman ini.
-          </p>
-          <form action={deletePostForm} className="mt-4">
-            <input type="hidden" name="id" value={p.id} />
-            <button type="submit" className={adminDangerZoneButton}>
-              Hapus artikel
-            </button>
-          </form>
-        </aside>
-      ) : null}
+      {isEdit && p ? <AdminDangerZone action={deletePostForm} id={p.id} noun="artikel" /> : null}
     </div>
   );
 }

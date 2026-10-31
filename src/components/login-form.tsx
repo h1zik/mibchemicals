@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { adminInput, adminPrimaryBtnWide } from "@/lib/admin-ui";
+import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { adminInput, adminLabel, adminPrimaryBtnWide } from "@/lib/admin-ui";
 
 export function LoginForm() {
   const router = useRouter();
@@ -38,14 +39,14 @@ export function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {error ? (
         <p
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm"
+          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
           role="alert"
         >
           {error}
         </p>
       ) : null}
       <div>
-        <label htmlFor="email" className="text-sm font-medium text-neutral-800">
+        <label htmlFor="email" className={adminLabel}>
           Email
         </label>
         <input
@@ -58,7 +59,7 @@ export function LoginForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="text-sm font-medium text-neutral-800">
+        <label htmlFor="password" className={adminLabel}>
           Password
         </label>
         <input
@@ -70,9 +71,9 @@ export function LoginForm() {
           className={adminInput}
         />
       </div>
-      <button type="submit" disabled={loading} className={adminPrimaryBtnWide}>
-        {loading ? "Masuk…" : "Masuk"}
-      </button>
+      <AdminSubmitButton pending={loading} pendingLabel="Masuk…" className={adminPrimaryBtnWide}>
+        Masuk
+      </AdminSubmitButton>
     </form>
   );
 }

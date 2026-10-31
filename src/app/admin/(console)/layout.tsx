@@ -1,12 +1,22 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { AdminConsoleProviders } from "@/components/admin/admin-console-providers";
+import { AdminBreadcrumb } from "@/components/admin/admin-breadcrumb";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { signOut } from "@/actions/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { AdminDraftCounts, AdminDraftKey } from "@/lib/admin-nav";
 import { LogOut } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+const DRAFT_TABLES: AdminDraftKey[] = [
+  "industries",
+  "solutions",
+  "services",
+  "testimonials",
+  "products",
+  "posts",
+];
 
 function initialsFromEmail(email: string | undefined) {
   if (!email) return "?";
@@ -36,53 +46,52 @@ export default async function AdminConsoleLayout({
     redirect("/admin/login?no_access=1");
   }
 
+  const draftResults = await Promise.all(
+    DRAFT_TABLES.map((t) =>
+      supabase.from(t).select("id", { count: "exact", head: true }).eq("published", false),
+    ),
+  );
+  const draftCounts: AdminDraftCounts = Object.fromEntries(
+    DRAFT_TABLES.map((t, i) => [t, draftResults[i].count ?? 0]),
+  );
+
   const email = user.email ?? "";
   const initials = initialsFromEmail(email);
 
   return (
-    <div
-      className="flex min-h-screen flex-col bg-[#eef1f4] md:flex-row"
-      data-color-mode="light"
-    >
-      <AdminSidebar />
+    <div className="min-h-screen bg-admin-canvas text-admin-ink md:flex" data-color-mode="light">
+      <AdminSidebar draftCounts={draftCounts} />
       <AdminConsoleProviders>
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 border-b border-neutral-200/90 bg-white/90 backdrop-blur-md">
-            <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-              <div className="flex min-w-0 items-center gap-3">
+          <header className="sticky top-14 z-20 border-b border-admin-line bg-white/85 backdrop-blur-md md:top-0">
+            <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+              <AdminBreadcrumb />
+              <div className="flex shrink-0 items-center gap-2">
                 <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mib/10 text-xs font-bold text-mib"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-mib/10 text-[11px] font-bold text-mib-dark"
+                  title={email || "Admin"}
                   aria-hidden
                 >
                   {initials}
                 </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-neutral-900">{email || "Admin"}</p>
-                  <p className="text-xs text-neutral-500">Administrator</p>
-                </div>
-              </div>
-              <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-                <Link
-                  href="/"
-                  className="hidden rounded-lg px-3 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 sm:inline-block"
-                >
-                  Situs
-                </Link>
+                <span className="hidden max-w-[14rem] truncate text-sm text-admin-muted lg:inline">
+                  {email || "Admin"}
+                </span>
                 <form action={signOut}>
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-admin-muted transition hover:bg-admin-canvas hover:text-admin-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-mib"
                   >
-                    <LogOut className="h-4 w-4 text-neutral-500" aria-hidden />
+                    <LogOut className="h-4 w-4" aria-hidden />
                     <span className="hidden sm:inline">Keluar</span>
                   </button>
                 </form>
               </div>
             </div>
           </header>
-          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8">
+          <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
             <div className="mx-auto w-full max-w-6xl">{children}</div>
-          </div>
+          </main>
         </div>
       </AdminConsoleProviders>
     </div>

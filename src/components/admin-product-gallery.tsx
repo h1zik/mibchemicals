@@ -24,13 +24,13 @@ export function AdminProductGallery({ productId, images }: Props) {
             return (
               <li
                 key={`${index}-${img.path ?? img.url ?? ""}`}
-                className="relative overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 shadow-sm"
+                className="relative overflow-hidden rounded-xl border border-admin-line bg-admin-canvas shadow-sm"
               >
                 {src ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={src} alt="" className="aspect-square w-full object-cover" />
                 ) : (
-                  <div className="flex aspect-square items-center justify-center bg-neutral-100 text-xs text-neutral-500">
+                  <div className="flex aspect-square items-center justify-center bg-admin-soft text-xs text-admin-muted">
                     URL tidak valid
                   </div>
                 )}
@@ -53,12 +53,12 @@ export function AdminProductGallery({ productId, images }: Props) {
           })}
         </ul>
       ) : (
-        <p className="text-sm text-neutral-500">Belum ada gambar.</p>
+        <p className="text-sm text-admin-muted">Belum ada gambar.</p>
       )}
 
       <AdminSaveForm
         action={appendProductGalleryImage}
-        className="flex flex-col gap-4 border-t border-neutral-100 pt-4 sm:flex-row sm:flex-wrap sm:items-end"
+        className="flex flex-col gap-4 border-t border-admin-line pt-4 sm:flex-row sm:flex-wrap sm:items-end"
         successMessage="Gambar ditambahkan ke galeri."
       >
         <input type="hidden" name="product_id" value={productId} />
@@ -72,7 +72,7 @@ export function AdminProductGallery({ productId, images }: Props) {
             name="file"
             required
             accept="image/*"
-            className="mt-1 block w-full text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15"
+            className="mt-1 block w-full text-sm text-admin-muted file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15"
           />
         </div>
         <div className="min-w-0 flex-1 sm:max-w-xs">

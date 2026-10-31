@@ -1,16 +1,13 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormActions } from "@/components/admin/admin-form-actions";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { ContentImageUpload } from "@/components/admin/content-image-upload";
 import { deleteTestimonialForm, upsertTestimonial } from "@/actions/admin";
 import {
-  adminDangerZoneButton,
-  adminGhostLink,
   adminInput,
   adminLabel,
-  adminMutedLink,
-  adminPrimaryBtn,
 } from "@/lib/admin-ui";
 import type { Industry, Testimonial } from "@/types/database";
 
@@ -25,20 +22,13 @@ export function TestimonialEditorForm({ testimonial, industries }: Props) {
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <Link href="/admin/testimonials" className={`${adminMutedLink} inline-flex items-center gap-1.5`}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar testimoni
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-          {isEdit ? "Edit testimoni" : "Testimoni baru"}
-        </h1>
-        {!isEdit ? (
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
-            Kutipan pelanggan tampil di beranda. Simpan dulu untuk mengunggah foto/avatar.
-          </p>
-        ) : null}
-      </div>
+      <AdminEditorHeader
+        backHref="/admin/testimonials"
+        backLabel="Daftar testimoni"
+        title={isEdit ? "Edit testimoni" : "Testimoni baru"}
+        published={s?.published}
+        description={isEdit ? undefined : "Kutipan pelanggan tampil di beranda. Simpan dulu untuk mengunggah foto/avatar."}
+      />
 
       <AdminSaveForm action={upsertTestimonial} className="space-y-8" successMessage="Testimoni berhasil disimpan.">
         {isEdit && s ? <input type="hidden" name="id" value={s.id} /> : null}
@@ -98,33 +88,19 @@ export function TestimonialEditorForm({ testimonial, industries }: Props) {
             <label htmlFor="tst-sort" className={adminLabel}>Urutan</label>
             <input id="tst-sort" name="sort_order" type="number" defaultValue={s?.sort_order ?? 0} className={adminInput} />
           </div>
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-admin-line bg-admin-canvas/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
             <input type="checkbox" name="published" defaultChecked={s?.published ?? true} className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-mib focus:ring-mib focus:ring-offset-0" />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-neutral-900">Published</span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-600">Tampilkan testimoni di situs publik.</span>
+              <span className="block text-sm font-semibold text-admin-ink">Published</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">Tampilkan testimoni di situs publik.</span>
             </span>
           </label>
         </AdminFormSection>
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/admin/testimonials" className={`${adminGhostLink} py-2 sm:py-0`}>Batal</Link>
-          <button type="submit" className={`${adminPrimaryBtn} w-full justify-center sm:w-auto`}>
-            {isEdit ? "Simpan perubahan" : "Simpan & lanjut unggah foto"}
-          </button>
-        </div>
+        <AdminFormActions cancelHref="/admin/testimonials" submitLabel={isEdit ? "Simpan perubahan" : "Simpan & lanjut unggah foto"} />
       </AdminSaveForm>
 
-      {isEdit && s ? (
-        <aside className="mt-8 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">
-          <h2 className="text-sm font-bold text-red-900">Zona bahaya</h2>
-          <p className="mt-1 text-sm text-red-800/90">Menghapus testimoni tidak dapat dibatalkan.</p>
-          <form action={deleteTestimonialForm} className="mt-4">
-            <input type="hidden" name="id" value={s.id} />
-            <button type="submit" className={adminDangerZoneButton}>Hapus testimoni</button>
-          </form>
-        </aside>
-      ) : null}
+      {isEdit && s ? <AdminDangerZone action={deleteTestimonialForm} id={s.id} noun="testimoni" /> : null}
     </div>
   );
 }

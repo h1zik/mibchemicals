@@ -1,17 +1,19 @@
 type AdminFormSectionProps = {
   title: string;
-  description?: string;
+  description?: React.ReactNode;
   children: React.ReactNode;
 };
 
 export function AdminFormSection({ title, description, children }: AdminFormSectionProps) {
   return (
-    <section className="rounded-2xl border border-neutral-200/90 bg-white p-5 shadow-sm sm:p-6">
-      <header className="border-b border-neutral-100 pb-4">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-neutral-900">{title}</h2>
-        {description ? <p className="mt-1.5 text-sm leading-relaxed text-neutral-600">{description}</p> : null}
+    <section className="rounded-xl border border-admin-line bg-white">
+      <header className="border-b border-admin-line px-5 py-4 sm:px-6">
+        <h2 className="font-display text-base font-semibold tracking-tight text-admin-ink">{title}</h2>
+        {description ? (
+          <p className="mt-0.5 text-sm leading-relaxed text-admin-muted">{description}</p>
+        ) : null}
       </header>
-      <div className="mt-5 space-y-5">{children}</div>
+      <div className="space-y-5 p-5 sm:p-6">{children}</div>
     </section>
   );
 }

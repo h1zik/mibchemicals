@@ -1,19 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminMarkdownEditor } from "@/components/admin-markdown-editor";
 import { AdminProductGallery } from "@/components/admin-product-gallery";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormActions } from "@/components/admin/admin-form-actions";
 import { AdminSaveForm } from "@/components/admin/admin-save-form";
 import { deleteProductForm, uploadProductMsds, upsertProduct } from "@/actions/admin";
-import {
-  adminCard,
-  adminDangerZoneButton,
-  adminGhostLink,
-  adminInput,
-  adminLabel,
-  adminMutedLink,
-  adminPrimaryBtn,
-} from "@/lib/admin-ui";
+import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { adminInput, adminLabel, adminSecondaryBtn } from "@/lib/admin-ui";
 import type { Product, ProductCategory } from "@/types/database";
 
 const DEFAULT_SPECS = '{\n  "appearance": "",\n  "pH": ""\n}';
@@ -30,51 +25,30 @@ export function ProductEditorForm({ product, categories }: Props) {
   const specsStr = JSON.stringify(p?.specs_json ?? {}, null, 2);
   const galleryStr = JSON.stringify(p?.gallery_images ?? [], null, 2);
 
-  const outlineBtn =
-    "inline-flex items-center justify-center rounded-lg border-2 border-mib bg-white px-4 py-2 text-sm font-semibold text-mib shadow-sm transition hover:bg-mib/5";
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <Link href="/admin/products" className={`${adminMutedLink} inline-flex items-center gap-1.5`}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar produk
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-          {isEdit ? "Edit produk" : "Produk baru"}
-        </h1>
-        {isEdit && p ? (
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            {publicPath ? (
-              <Link
-                href={publicPath}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-medium text-neutral-500 transition hover:text-mib"
-              >
-                Pratinjau publik
-                <ExternalLink className="h-3 w-3" aria-hidden />
-              </Link>
-            ) : null}
-          </div>
-        ) : (
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
-            Nama, kategori, deskripsi Markdown, spesifikasi JSON, dan galeri. Slug opsional saat baru.
+      <AdminEditorHeader
+        backHref="/admin/products"
+        backLabel="Daftar produk"
+        title={isEdit ? "Edit produk" : "Produk baru"}
+        published={p?.published}
+        publicPath={p?.published ? publicPath : null}
+        description={isEdit ? undefined : "Nama, kategori, deskripsi Markdown, spesifikasi JSON, dan galeri. Slug opsional saat baru."}
+      />
+
+      {categories.length === 0 ? (
+        <div className="-mt-2 mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <p className="font-semibold">Belum ada kategori produk</p>
+          <p className="mt-1 text-amber-900/90">
+            Buat minimal satu kategori di{" "}
+            <Link href="/admin/product-categories" className="font-semibold underline hover:no-underline">
+              Kategori produk
+            </Link>{" "}
+            sebelum menyimpan produk.
           </p>
-        )}
-        {categories.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
-            <p className="font-semibold">Belum ada kategori produk</p>
-            <p className="mt-1 text-amber-900/90">
-              Buat minimal satu kategori di{" "}
-              <Link href="/admin/product-categories" className="font-semibold underline hover:no-underline">
-                Kategori produk
-              </Link>{" "}
-              sebelum menyimpan produk.
-            </p>
-          </div>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       <AdminSaveForm action={upsertProduct} className="space-y-8" successMessage="Produk berhasil disimpan.">
         {isEdit && p ? <input type="hidden" name="id" value={p.id} /> : null}
@@ -101,7 +75,7 @@ export function ProductEditorForm({ product, categories }: Props) {
               className={`${adminInput} font-mono text-sm`}
               placeholder="nama-produk"
             />
-            <p className="mt-1.5 text-xs text-neutral-500">URL publik: /products/[slug]. Kosongkan untuk dibuat dari nama.</p>
+            <p className="mt-1.5 text-xs text-admin-muted">URL publik: /products/[slug]. Kosongkan untuk dibuat dari nama.</p>
           </div>
           <div>
             <label htmlFor="prd-cat" className={adminLabel}>
@@ -126,7 +100,7 @@ export function ProductEditorForm({ product, categories }: Props) {
                 ))
               )}
             </select>
-            <p className="mt-1.5 text-xs text-neutral-500">
+            <p className="mt-1.5 text-xs text-admin-muted">
               Kelola daftar di{" "}
               <Link href="/admin/product-categories" className="font-semibold text-mib hover:underline">
                 Kategori produk
@@ -134,7 +108,7 @@ export function ProductEditorForm({ product, categories }: Props) {
               .
             </p>
           </div>
-          <div className="!mt-6 border-t border-neutral-100 pt-6">
+          <div className="!mt-6 border-t border-admin-line pt-6">
             <AdminMarkdownEditor
               label="Deskripsi (Markdown)"
               name="description_md"
@@ -160,7 +134,7 @@ export function ProductEditorForm({ product, categories }: Props) {
               defaultValue={isEdit ? specsStr : DEFAULT_SPECS}
               className={`${adminInput} font-mono text-xs leading-relaxed`}
             />
-            <p className="mt-1.5 text-xs text-neutral-500">Pasangan key/string, mis. appearance, pH, packaging.</p>
+            <p className="mt-1.5 text-xs text-admin-muted">Pasangan key/string, mis. appearance, pH, packaging.</p>
           </div>
           <div>
             <label htmlFor="prd-gallery-json" className={adminLabel}>
@@ -174,7 +148,7 @@ export function ProductEditorForm({ product, categories }: Props) {
               className={`${adminInput} font-mono text-xs leading-relaxed`}
               placeholder="[]"
             />
-            <p className="mt-1.5 text-xs text-neutral-500">
+            <p className="mt-1.5 text-xs text-admin-muted">
               Array objek dengan path (bucket product-gallery) atau url absolut, opsional alt. Sinkron dengan
               unggah galeri bila tersedia.
             </p>
@@ -197,7 +171,7 @@ export function ProductEditorForm({ product, categories }: Props) {
               className={adminInput}
             />
           </div>
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-admin-line bg-admin-canvas/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
             <input
               type="checkbox"
               name="featured"
@@ -205,13 +179,13 @@ export function ProductEditorForm({ product, categories }: Props) {
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-mib focus:ring-mib focus:ring-offset-0"
             />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-neutral-900">Featured</span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-600">
+              <span className="block text-sm font-semibold text-admin-ink">Featured</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">
                 Tampilkan produk sebagai sorotan di blok katalog (jika didukung tema).
               </span>
             </span>
           </label>
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-admin-line bg-admin-canvas/60 p-4 transition has-[:checked]:border-mib/35 has-[:checked]:bg-mib/[0.06]">
             <input
               type="checkbox"
               name="published"
@@ -219,8 +193,8 @@ export function ProductEditorForm({ product, categories }: Props) {
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-mib focus:ring-mib focus:ring-offset-0"
             />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-neutral-900">Published</span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-600">
+              <span className="block text-sm font-semibold text-admin-ink">Published</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">
                 Produk tampil di situs publik dan halaman katalog.
               </span>
             </span>
@@ -256,53 +230,44 @@ export function ProductEditorForm({ product, categories }: Props) {
           </div>
         </AdminFormSection>
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/admin/products" className={`${adminGhostLink} py-2 sm:py-0`}>
-            Batal
-          </Link>
-          <button type="submit" className={`${adminPrimaryBtn} w-full justify-center sm:w-auto`}>
-            {isEdit ? "Simpan perubahan" : "Simpan produk"}
-          </button>
-        </div>
+        <AdminFormActions cancelHref="/admin/products" submitLabel={isEdit ? "Simpan perubahan" : "Simpan produk"} />
       </AdminSaveForm>
 
       {isEdit && p ? (
         <>
-          <section className="mt-10 space-y-3">
-            <div>
-              <h2 className="text-lg font-bold tracking-tight text-neutral-900">Galeri gambar</h2>
-              <p className="mt-1 text-sm leading-relaxed text-neutral-600">
-                Unggah ke bucket <code className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-xs text-mib">product-gallery</code>
-                . Anda juga bisa menyunting array JSON di bagian{" "}
-                <span className="font-semibold text-neutral-800">Data teknis & galeri</span>{" "}
-                di atas.
-              </p>
-            </div>
-            <div className={adminCard}>
+          <div className="mt-8 space-y-8">
+            <AdminFormSection
+              title="Galeri gambar"
+              description={
+                <>
+                  Unggah ke bucket <code className="rounded bg-admin-soft px-1 font-mono text-xs">product-gallery</code>.
+                  Array JSON juga bisa disunting di bagian Data teknis & galeri di atas.
+                </>
+              }
+            >
               <AdminProductGallery productId={p.id} images={p.gallery_images ?? []} />
-            </div>
-          </section>
+            </AdminFormSection>
 
-          <section className="mt-10 space-y-3">
-            <div>
-              <h2 className="text-lg font-bold tracking-tight text-neutral-900">MSDS</h2>
-              <p className="mt-1 text-sm leading-relaxed text-neutral-600">
-                Unggah PDF ke bucket Supabase <code className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-xs text-mib">msds</code>
-                . File dapat diunduh dari halaman produk.
-              </p>
-            </div>
-            <div className={adminCard}>
+            <AdminFormSection
+              title="MSDS"
+              description={
+                <>
+                  PDF disimpan di bucket <code className="rounded bg-admin-soft px-1 font-mono text-xs">msds</code> dan bisa
+                  diunduh dari halaman produk.
+                </>
+              }
+            >
               {p.msds_original_filename ? (
-                <p className="text-sm text-neutral-700">
+                <p className="text-sm text-admin-ink">
                   File saat ini: <span className="font-semibold">{p.msds_original_filename}</span>
                 </p>
               ) : (
-                <p className="text-sm text-neutral-500">Belum ada file MSDS.</p>
+                <p className="text-sm text-admin-muted">Belum ada file MSDS.</p>
               )}
               <AdminSaveForm
                 action={uploadProductMsds}
-                className="mt-4 flex flex-wrap items-end gap-4 border-t border-neutral-100 pt-4"
-                successMessage="MSDS berhasil diunggah."
+                className="flex flex-wrap items-end gap-4 border-t border-admin-line pt-4"
+                successMessage="MSDS diunggah."
               >
                 <input type="hidden" name="product_id" value={p.id} />
                 <div>
@@ -315,29 +280,17 @@ export function ProductEditorForm({ product, categories }: Props) {
                     name="file"
                     required
                     accept="application/pdf,.pdf"
-                    className="mt-1 block w-full max-w-xs text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib hover:file:bg-mib/15"
+                    className="mt-1.5 block w-full max-w-xs text-sm text-admin-muted file:mr-3 file:rounded-lg file:border-0 file:bg-mib/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mib-dark hover:file:bg-mib/15"
                   />
                 </div>
-                <button type="submit" className={outlineBtn}>
-                  Upload / ganti MSDS
-                </button>
+                <AdminSubmitButton className={adminSecondaryBtn} pendingLabel="Mengunggah…">
+                  Unggah MSDS
+                </AdminSubmitButton>
               </AdminSaveForm>
-            </div>
-          </section>
+            </AdminFormSection>
+          </div>
 
-          <aside className="mt-10 rounded-2xl border border-red-200/80 bg-red-50/40 p-5 sm:p-6">
-            <h2 className="text-sm font-bold text-red-900">Zona bahaya</h2>
-            <p className="mt-1 text-sm text-red-800/90">
-              Menghapus produk tidak dapat dibatalkan. Tautan /products/{p.slug} dan berkas terkait perlu dibersihkan
-              manual di storage bila perlu.
-            </p>
-            <form action={deleteProductForm} className="mt-4">
-              <input type="hidden" name="id" value={p.id} />
-              <button type="submit" className={adminDangerZoneButton}>
-                Hapus produk
-              </button>
-            </form>
-          </aside>
+          <AdminDangerZone action={deleteProductForm} id={p.id} noun="produk" note="Menghapus produk tidak dapat dibatalkan. Berkas galeri & MSDS di storage perlu dibersihkan manual bila perlu." />
         </>
       ) : null}
     </div>

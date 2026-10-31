@@ -25,19 +25,19 @@ export function CredibilitySectionEditor({ initialStats, initialCerts }: Props) 
 
   return (
     <div className="space-y-6">
-      <p className="text-sm leading-relaxed text-neutral-600">
+      <p className="text-sm leading-relaxed text-admin-muted">
         Angka statistik dan sertifikasi tampil di blok kredibilitas beranda &amp; halaman Tentang. Biarkan kosong jika
         belum ada data resmi — blok akan otomatis disembunyikan. <strong>Jangan isi angka/sertifikat yang tidak nyata.</strong>
       </p>
 
       {/* Statistik */}
       <div>
-        <h4 className="text-xs font-bold uppercase tracking-wide text-neutral-500">Statistik perusahaan</h4>
+        <h4 className="font-display text-sm font-semibold text-admin-ink">Statistik perusahaan</h4>
         <ul className="mt-3 space-y-3">
           {stats.map((row, i) => (
-            <li key={i} className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 shadow-sm">
+            <li key={i} className="rounded-xl border border-admin-line bg-admin-canvas/60 p-4 shadow-sm">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-bold text-neutral-500">#{i + 1}</span>
+                <span className="text-xs font-bold text-admin-muted">#{i + 1}</span>
                 <button type="button" className={adminDangerLink} onClick={() => setStats((p) => p.filter((_, j) => j !== i))}>
                   Hapus
                 </button>
@@ -74,13 +74,13 @@ export function CredibilitySectionEditor({ initialStats, initialCerts }: Props) 
       </div>
 
       {/* Sertifikasi */}
-      <div className="border-t border-neutral-100 pt-6">
-        <h4 className="text-xs font-bold uppercase tracking-wide text-neutral-500">Sertifikasi / akreditasi</h4>
+      <div className="border-t border-admin-line pt-6">
+        <h4 className="font-display text-sm font-semibold text-admin-ink">Sertifikasi / akreditasi</h4>
         <ul className="mt-3 space-y-3">
           {certs.map((row, i) => (
-            <li key={i} className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 shadow-sm">
+            <li key={i} className="rounded-xl border border-admin-line bg-admin-canvas/60 p-4 shadow-sm">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-bold text-neutral-500">#{i + 1}</span>
+                <span className="text-xs font-bold text-admin-muted">#{i + 1}</span>
                 <button type="button" className={adminDangerLink} onClick={() => setCerts((p) => p.filter((_, j) => j !== i))}>
                   Hapus
                 </button>
